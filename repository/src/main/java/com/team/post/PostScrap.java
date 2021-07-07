@@ -27,10 +27,14 @@ public class PostScrap {
     public PostScrap(User user, Post post) {
         this.user = user;
         this.post = post;
-        setPost(user, post);
+        setPost(user);
     }
 
-    private void setPost(User user, Post post) {
-        user.getPostScraps().add(post);
+    private void setPost(User user) {
+        user.getPostScraps().add(this);
+    }
+
+    public void setIdForTest(Long id) {
+        this.id = id;
     }
 }
