@@ -1,7 +1,9 @@
 package com.team.post;
 
-import com.team.post.dto.input.PostScrapInput;
+import com.team.post.dto.input.PostScrapGetInput;
+import com.team.post.dto.input.PostScrapSaveInput;
 import com.team.post.dto.request.PostScrapSaveRequest;
+import com.team.post.dto.response.PostScrapGetResponse;
 import com.team.post.dto.response.PostScrapSaveResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +12,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import org.springframework.web.util.UriComponents;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -29,8 +32,19 @@ public class PostScrapController {
                 .body(
                         new PostScrapSaveResponse(
                                 postScrapService.postScrap(
-                                        new PostScrapInput(request.getUserId(), request.getPostId())
+                                        new PostScrapSaveInput(request.getUserId(), request.getPostId())
                                 )
+                        )
+                );
+    }
+
+    @GetMapping("/{user-id}")
+    public ResponseEntity<PostScrapGetResponse> getScrap(@NotNull @PathVariable(name = "user-id") Long userId) {
+
+        return ResponseEntity
+                .ok(
+                        new PostScrapGetResponse(
+                                postScrapService.getScrap(new PostScrapGetInput(userId))
                         )
                 );
     }

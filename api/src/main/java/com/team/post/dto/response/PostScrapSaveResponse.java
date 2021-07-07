@@ -1,6 +1,6 @@
 package com.team.post.dto.response;
 
-import com.team.post.dto.output.PostScrapInfoOutput;
+import com.team.post.dto.output.PostScrapSaveOutput;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ public class PostScrapSaveResponse {
         this.postScrapId = postScrapId;
     }
 
-    public PostScrapSaveResponse(PostScrapInfoOutput output) {
+    public PostScrapSaveResponse(PostScrapSaveOutput output) {
         this.postScrapId = output.getPostScrapId();
     }
 }
