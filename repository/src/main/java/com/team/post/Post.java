@@ -18,7 +18,7 @@ import java.util.Set;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String content;
@@ -49,6 +49,7 @@ public class Post {
 
     private void setAuthor(User user){
         this.user = user;
+        user.getPosts().add(this);
     }
 
     public void addLike(PostLike postLike){
