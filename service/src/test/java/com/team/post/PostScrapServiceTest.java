@@ -1,5 +1,6 @@
 package com.team.post;
 
+import com.team.post.dto.input.PostScrapDeleteInput;
 import com.team.post.dto.input.PostScrapGetInput;
 import com.team.post.dto.input.PostScrapSaveInput;
 import com.team.post.dto.output.PostScrapGetOutput;

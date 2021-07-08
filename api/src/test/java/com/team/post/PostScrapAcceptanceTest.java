@@ -89,4 +89,22 @@ public class PostScrapAcceptanceTest {
             Assertions.assertThat(actual.get(i).getPostScrapId()).isEqualTo(expected.get(i).getId());
         }
     }
+
+    @Test
+    void 스크랩_삭제하기() {
+        User user = userData.saveUser("승화", "peach", "a@naver.com");
+        Post post1 = postData.savePost("안녕하세요", user);
+        Post post2 = postData.savePost("안녕하세요", user);
+        PostScrap postScrap1 = postScrapData.savePostScrap(user, post1);
+        PostScrap postScrap2 = postScrapData.savePostScrap(user, post2);
+
+        given()
+                .port(port)
+                .accept("application/json")
+        .when()
+                .delete("/scrap/{user-id}/{post-id}",user.getId(), post1.getId())
+        .then()
+                .statusCode(204);
+
+    }
 }

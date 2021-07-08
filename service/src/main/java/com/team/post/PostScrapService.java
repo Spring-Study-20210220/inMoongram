@@ -1,6 +1,7 @@
 package com.team.post;
 
 import com.team.exception.IdNotFoundException;
+import com.team.post.dto.input.PostScrapDeleteInput;
 import com.team.post.dto.input.PostScrapGetInput;
 import com.team.post.dto.input.PostScrapSaveInput;
 import com.team.post.dto.output.PostScrapGetOutput;
@@ -36,5 +37,11 @@ public class PostScrapService {
                 .map(PostScrapGetOutput.PostScrapInfo::new)
                 .collect(Collectors.toList())
         );
+    }
+
+    public void unScrap(PostScrapDeleteInput input) {
+        PostScrap postScrap = postScrapRepository.findByUserIdAndPostId(input.getUserId(), input.getPostId())
+                .orElseThrow(IdNotFoundException::new);
+        postScrapRepository.deleteById(postScrap.getId());
     }
 }

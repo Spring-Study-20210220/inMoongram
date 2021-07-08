@@ -1,5 +1,6 @@
 package com.team.post;
 
+import com.team.post.dto.input.PostScrapDeleteInput;
 import com.team.post.dto.input.PostScrapGetInput;
 import com.team.post.dto.input.PostScrapSaveInput;
 import com.team.post.dto.request.PostScrapSaveRequest;
@@ -47,5 +48,13 @@ public class PostScrapController {
                                 postScrapService.getScrap(new PostScrapGetInput(userId))
                         )
                 );
+    }
+
+    @DeleteMapping("/{user-id}/{post-id}")
+    public ResponseEntity<?> unScrap(@NotNull @PathVariable(name = "user-id") Long userId, @NotNull @PathVariable(name = "post-id") Long postId) {
+        postScrapService.unScrap(new PostScrapDeleteInput(userId, postId));
+
+        return ResponseEntity.noContent()
+                .build();
     }
 }
