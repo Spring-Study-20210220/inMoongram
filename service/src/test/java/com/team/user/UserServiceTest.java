@@ -62,7 +62,7 @@ class UserServiceTest {
 
     @Test
     void 팔로우_목록_조회() {
-        given(userRepository.findById(any())).willReturn(Optional.of(user1));
+        given(userRepository.findFollowingUserById(any())).willReturn(Optional.of(user1));
         FollowListOutput followList = userService.getFollowList(1L);
 
         assertThat(followList.getUsers().size()).isEqualTo(2);
