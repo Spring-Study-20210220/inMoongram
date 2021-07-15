@@ -1,7 +1,9 @@
 package com.team.post;
 
+import com.team.exception.IdNotFoundException;
 import com.team.post.dto.input.SavePostInput;
 import com.team.post.dto.output.SavePostOutput;
+import com.team.tag.PostTaggedKeyword;
 import com.team.tag.PostTaggedUser;
 import com.team.user.User;
 import com.team.user.UserService;
@@ -20,6 +22,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostImageService postImageService;
     private final PostTaggedUserService taggedUserService;
+    private final PostTaggedKeywordService postTaggedKeywordService;
 
     public SavePostOutput save(SavePostInput input) {
         User user = userService.findUserById(input.getUserId());
@@ -28,7 +31,15 @@ public class PostService {
 
         addImages(input, savePost);
         tagUsers(input, savePost);
+        tagKeywords(input, savePost);
         return new SavePostOutput(savePost);
+    }
+
+    public void delete(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(IdNotFoundException::new);
+        post.delete();
+        postRepository.delete(post);
     }
 
     private void addImages(SavePostInput input, Post post) {
@@ -40,6 +51,11 @@ public class PostService {
         List<User> taggedUsers = getTaggedUsers(input.getTaggedUserIds());
         List<PostTaggedUser> postTaggedUsers = taggedUserService.tagAll(taggedUsers, post);
         post.addTaggedUsers(postTaggedUsers);
+    }
+
+    private void tagKeywords(SavePostInput input, Post post) {
+        List<PostTaggedKeyword> postTaggedKeywords = postTaggedKeywordService.tagAll(input.getTaggedKeywords(), post);
+        post.addTaggedKeywords(postTaggedKeywords);
     }
 
     private List<User> getTaggedUsers(List<Long> userIds) {
