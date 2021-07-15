@@ -18,4 +18,8 @@ public class TagKeyword {
     private Long id;
 
     private String keyword;
+
+    public TagKeyword(String keyword) {
+        this.keyword = keyword;
+    }
 }
