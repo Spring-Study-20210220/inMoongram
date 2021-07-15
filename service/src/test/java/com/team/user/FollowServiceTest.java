@@ -37,20 +37,21 @@ class FollowServiceTest {
     @BeforeEach
     void setUp() {
         user1 = User.builder()
+                .id(1L)
                 .name("testUser1")
                 .nickname("testNickname1")
                 .email("test1@test.com")
                 .password("testPassword1")
                 .build();
-        user1.setIdForTest(1L);
         user2 = User.builder()
+                .id(2L)
                 .name("testUser2")
                 .nickname("testNickname2")
                 .email("test2@test.com")
                 .password("testPassword2")
                 .build();
-        user2.setIdForTest(2L);
         user3 = User.builder()
+                .id(3L)
                 .name("testUser3")
                 .nickname("testNickname3")
                 .email("test3@test.com")
