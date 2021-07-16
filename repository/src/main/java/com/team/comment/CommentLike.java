@@ -27,8 +27,12 @@ public class CommentLike {
     public CommentLike(Comment comment, User user) {
         this.comment = comment;
         this.user = user;
+        this.comment.getCommentLikes().add(this);
     }
 
+    public void deleteCommentLike() {
+        this.comment.getCommentLikes().remove(this);
+    }
     public void setIdForTest(Long id) {
         this.id = id;
     }
