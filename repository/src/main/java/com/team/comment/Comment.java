@@ -39,4 +39,8 @@ public class Comment {
         this.post = post;
         post.addComment(this);
     }
+
+    public void setIdForTest(Long id) {
+        this.id = id;
+    }
 }
