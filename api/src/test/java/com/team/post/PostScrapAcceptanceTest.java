@@ -49,7 +49,7 @@ public class PostScrapAcceptanceTest {
     @Test
     void 스크랩_저장() {
         User user = userData.saveUser("승화", "peach", "a@naver.com");
-        Post post = postData.savePost("안녕하세요", user);
+        Post post = postData.savePost(user);
 
         given()
                 .port(port)
@@ -66,8 +66,8 @@ public class PostScrapAcceptanceTest {
     @Test
     void 스크랩_불러오기() {
         User user = userData.saveUser("승화", "peach", "a@naver.com");
-        Post post1 = postData.savePost("안녕하세요", user);
-        Post post2 = postData.savePost("안녕하세요", user);
+        Post post1 = postData.savePost(user);
+        Post post2 = postData.savePost(user);
         PostScrap postScrap1 = postScrapData.savePostScrap(user, post1);
         PostScrap postScrap2 = postScrapData.savePostScrap(user, post2);
 
@@ -93,8 +93,8 @@ public class PostScrapAcceptanceTest {
     @Test
     void 스크랩_삭제하기() {
         User user = userData.saveUser("승화", "peach", "a@naver.com");
-        Post post1 = postData.savePost("안녕하세요", user);
-        Post post2 = postData.savePost("안녕하세요", user);
+        Post post1 = postData.savePost(user);
+        Post post2 = postData.savePost(user);
         PostScrap postScrap1 = postScrapData.savePostScrap(user, post1);
         PostScrap postScrap2 = postScrapData.savePostScrap(user, post2);
 
