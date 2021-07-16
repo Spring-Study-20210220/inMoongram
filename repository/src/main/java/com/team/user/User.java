@@ -90,5 +90,9 @@ public class User {
         this.website = website;
         this.profileImage = profileImage;
     }
+
+    public void setIdForTest(Long id) {
+        this.id = id;
+    }
 }
 
