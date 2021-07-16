@@ -30,6 +30,9 @@ public class CommentLikeService {
 
     @Transactional
     public void cancel(CommentLikeCancelInput input) {
+        CommentLike commentLike = commentLikeRepository.findCommentLikeById(input.getCommentLikeId())
+                .orElseThrow(IdNotFoundException::new);
+        commentLike.deleteCommentLike();
         commentLikeRepository.deleteById(input.getCommentLikeId());
     }
 }
