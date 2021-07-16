@@ -1,7 +1,9 @@
 package com.team.post;
 
 import com.team.exception.IdNotFoundException;
+import com.team.post.dto.input.FeedInput;
 import com.team.post.dto.input.SavePostInput;
+import com.team.post.dto.output.FeedOutput;
 import com.team.post.dto.output.SavePostOutput;
 import com.team.tag.PostTaggedKeyword;
 import com.team.tag.PostTaggedUser;
@@ -35,6 +37,11 @@ public class PostService {
         return new SavePostOutput(savePost);
     }
 
+    public FeedOutput getFeed(FeedInput input) {
+        List<Post> feed = postRepository.getFeed(input.getUserId(), input.of());
+        return new FeedOutput(feed);
+    }
+
     public void delete(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(IdNotFoundException::new);
@@ -49,16 +56,23 @@ public class PostService {
 
     private void tagUsers(SavePostInput input, Post post) {
         List<User> taggedUsers = getTaggedUsers(input.getTaggedUserIds());
-        List<PostTaggedUser> postTaggedUsers = taggedUserService.tagAll(taggedUsers, post);
-        post.addTaggedUsers(postTaggedUsers);
+        if (taggedUsers != null) {
+            List<PostTaggedUser> postTaggedUsers = taggedUserService.tagAll(taggedUsers, post);
+            post.addTaggedUsers(postTaggedUsers);
+        }
     }
 
     private void tagKeywords(SavePostInput input, Post post) {
         List<PostTaggedKeyword> postTaggedKeywords = postTaggedKeywordService.tagAll(input.getTaggedKeywords(), post);
-        post.addTaggedKeywords(postTaggedKeywords);
+        if (postTaggedKeywords != null) {
+            post.addTaggedKeywords(postTaggedKeywords);
+        }
     }
 
     private List<User> getTaggedUsers(List<Long> userIds) {
+        if(userIds == null) {
+            return null;
+        }
         return userIds.stream()
                 .map(userService::findUserById)
                 .collect(Collectors.toList());

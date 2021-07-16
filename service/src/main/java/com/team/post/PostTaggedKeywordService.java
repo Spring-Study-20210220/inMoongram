@@ -19,6 +19,10 @@ public class PostTaggedKeywordService {
     private final PostTaggedKeywordRepository postTaggedKeywordRepository;
 
     public List<PostTaggedKeyword> tagAll(List<String> keywords, Post post) {
+        if (keywords == null) {
+            return null;
+        }
+
         List<PostTaggedKeyword> postTaggedKeywords = new ArrayList<>();
         for (String keyword : keywords) {
             TagKeyword tagKeyword = getTagKeyword(keyword); // 키워드가 존재한다면 오브젝트 반환, 존재하지 않으면 null 반환

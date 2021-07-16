@@ -1,5 +1,6 @@
 package com.team.post;
 
+import com.team.config.TestConfig;
 import com.team.user.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,6 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @DataJpaTest
+@Import(TestConfig.class)
 public class PostScrapRepositoryTest {
 
     @Autowired

@@ -20,13 +20,16 @@ public class PostImage {
 
     private String storeFileName; // 서버 내부에서 관리하는 파일 이름
 
+    private String path; // 파일 저장 경로
+
     @JoinColumn(name = "post_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Post post;
 
-    public PostImage(String uploadFileName, String storeFileName) {
+    public PostImage(String uploadFileName, String storeFileName, String path) {
         this.uploadFileName = uploadFileName;
         this.storeFileName = storeFileName;
+        this.path = path;
     }
 
     public void setPost(Post post){
