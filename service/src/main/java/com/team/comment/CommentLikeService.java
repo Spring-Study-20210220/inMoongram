@@ -1,5 +1,6 @@
 package com.team.comment;
 
+import com.team.comment.dto.input.CommentLikeCancelInput;
 import com.team.comment.dto.input.CommentLikePlusInput;
 import com.team.comment.dto.output.CommentLikePlusOutput;
 import com.team.exception.IdNotFoundException;
@@ -25,5 +26,10 @@ public class CommentLikeService {
                 .orElseThrow(IdNotFoundException::new);
         CommentLike saved = commentLikeRepository.save(new CommentLike(comment, user));
         return new CommentLikePlusOutput(saved.getId());
+    }
+
+    @Transactional
+    public void cancel(CommentLikeCancelInput input) {
+        commentLikeRepository.deleteById(input.getCommentLikeId());
     }
 }

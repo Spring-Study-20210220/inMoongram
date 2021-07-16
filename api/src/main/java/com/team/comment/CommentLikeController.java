@@ -1,18 +1,17 @@
 package com.team.comment;
 
+import com.team.comment.dto.input.CommentLikeCancelInput;
 import com.team.comment.dto.output.CommentLikePlusOutput;
 import com.team.comment.dto.request.CommentLikePlusRequest;
 import com.team.comment.dto.response.CommentLikePlusResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -31,5 +30,13 @@ public class CommentLikeController {
         return ResponseEntity
                 .created(uriComponent.toUri())
                 .body(new CommentLikePlusResponse(output));
+    }
+
+    @DeleteMapping("/{comment-like-id}")
+    public ResponseEntity<Void> cancel(@NotNull @PathVariable(name = "comment-like-id") Long commentLikeId) {
+        commentLikeService.cancel(new CommentLikeCancelInput(commentLikeId));
+        return ResponseEntity
+                .noContent()
+                .build();
     }
 }

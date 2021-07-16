@@ -65,4 +65,17 @@ public class CommentLikeAcceptanceTest {
                 .statusCode(201)
                 .body("commentLikeId", is(1));
     }
+
+    @Test
+    void 좋아요_취소() {
+        CommentLike saved = commentLikeData.saveCommentLike(comment1, user1);
+
+        given()
+                .port(port)
+                .accept("application/json")
+        .when()
+                .delete("/comment-like/{comment-like-id}", saved.getId())
+        .then()
+                .statusCode(204);
+    }
 }
