@@ -33,7 +33,7 @@ public class CommentLikeController {
     }
 
     @DeleteMapping("/{comment-like-id}")
-    public ResponseEntity<Void> cancel(@NotNull @PathVariable(name = "comment-like-id") Long commentLikeId) {
+    public ResponseEntity<Void> cancel(@PathVariable(name = "comment-like-id") Long commentLikeId) {
         commentLikeService.cancel(new CommentLikeCancelInput(commentLikeId));
         return ResponseEntity
                 .noContent()
