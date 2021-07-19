@@ -1,5 +1,6 @@
 package com.team.user;
 
+import com.team.QueryConfig;
 import com.team.dbutil.DatabaseCleanup;
 import com.team.dbutil.FollowData;
 import com.team.dbutil.UserData;
@@ -15,8 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 
+import javax.management.Query;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,6 +29,7 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(QueryConfig.class)
 class UserAcceptanceTest {
 
     @LocalServerPort
@@ -80,8 +84,11 @@ class UserAcceptanceTest {
         List<User> expected = Arrays.asList(user2);
         Assertions.assertThat(actual.size()).isEqualTo(2);
         for (FollowerInfoResponse followerInfoResponse : actual) {
-            if (followerInfoResponse.isFollowBack()) {
-                Assertions.assertThat(followerInfoResponse.getUserId()).isEqualTo(user2.getId());
+            if(followerInfoResponse.getUserId().equals(user2.getId())) {
+                Assertions.assertThat(followerInfoResponse.isFollowBack()).isTrue();
+            }
+            if(followerInfoResponse.getUserId().equals(user3.getId())) {
+                Assertions.assertThat(followerInfoResponse.isFollowBack()).isFalse();
             }
         }
     }
