@@ -31,20 +31,9 @@ public class UserService {
 
     @Transactional
     public FollowerInfoListOutput getFollowerList(FollowerInfoListInput command) {
-        User user = userRepository.findFollowerUserById(command.getUserId()).orElseThrow(
-                IdNotFoundException::new
-        );
+        List<Follower> followers = userRepository.findFollowerUserById(command.getUserId());
 
-        return new FollowerInfoListOutput(
-                user.getFollowers().stream()
-                        .map(it -> new FollowerInfoOutput(
-                                        it,
-                                        it.getFollower().getFollowers().stream()
-                                                .anyMatch(f4f -> f4f.getFollower().getId().equals(command.getUserId()))
-                                )
-                        )
-                        .collect(Collectors.toList())
-        );
+        return new FollowerInfoListOutput(followers, command.getUserId());
     }
 
     @Transactional(readOnly = true)

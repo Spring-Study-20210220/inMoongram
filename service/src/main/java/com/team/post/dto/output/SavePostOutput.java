@@ -40,6 +40,5 @@ public class SavePostOutput {
         this.postImages = post.getPostImages().stream().map(PostImage::getUploadFileName).collect(Collectors.toList());
         this.taggedUserIds = post.getPostTaggedUsers().stream().map(it -> it.getUser().getId()).collect(Collectors.toList());
         this.createdAt = post.getCreatedAt();
-        this.lastModified = post.getLastModified();
     }
 }
