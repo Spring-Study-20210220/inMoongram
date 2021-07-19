@@ -13,18 +13,12 @@ import java.util.stream.Collectors;
 public class FollowerInfoListOutput {
     private List<FollowerInfoOutput> followerInfoOutputList;
 
-    /*
-    public FollowerInfoListOutput(List<FollowerInfoOutput> followerInfoOutputList) {
-        this.followerInfoOutputList = followerInfoOutputList;
-    }
-     */
-
     public FollowerInfoListOutput(List<Follower> followers, Long id) {
 
         this.followerInfoOutputList = followers.stream()
                 .map(f -> FollowerInfoOutput.builder()
                         .name(f.getName())
-                        .nickName(f.getNickName())
+                        .nickName(f.getNickname())
                         .profileImage(f.getProfileImage())
                         .userId(f.getUserId())
                         .followBack(

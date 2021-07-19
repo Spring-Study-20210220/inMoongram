@@ -19,7 +19,6 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 
-import javax.management.Query;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -66,6 +65,8 @@ class UserAcceptanceTest {
         Assertions.assertThat(actual.size()).isEqualTo(expected.size());
         for (int i = 0; i < actual.size(); i++) {
             Assertions.assertThat(actual.get(i).getUserId()).isEqualTo(expected.get(i).getId());
+            Assertions.assertThat(actual.get(i).getName()).isEqualTo(expected.get(i).getName());
+            Assertions.assertThat(actual.get(i).getNickName()).isEqualTo(expected.get(i).getNickname());
         }
     }
 

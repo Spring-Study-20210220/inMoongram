@@ -18,7 +18,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
         QFollow follow2 = new QFollow("follow2");
         return jpaQueryFactory
                 .select(Projections.fields(Follower.class,
-                        follow.follower.id.as("userId"), user.nickname, user.name, user.profileImage, follow2.follower.id.as("followerId")
+                        follow.follower.id.as("userId"), user2.nickname, user2.name, user2.profileImage, follow2.follower.id.as("followerId")
                 ))
                 .from(user)
                 .leftJoin(follow).on(user.id.eq(follow.followee.id))
