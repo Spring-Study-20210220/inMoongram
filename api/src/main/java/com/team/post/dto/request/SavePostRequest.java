@@ -22,12 +22,15 @@ public class SavePostRequest {
 
     private List<Long> taggedUserIds;
 
+    private List<String> taggedKeywords;
+
     @Builder
-    public SavePostRequest(Long userId, String content, List<MultipartFile> postImages, List<Long> taggedUserIds) {
+    public SavePostRequest(Long userId, String content, List<MultipartFile> postImages, List<Long> taggedUserIds, List<String> taggedKeywords) {
         this.userId = userId;
         this.content = content;
         this.postImages = postImages;
         this.taggedUserIds = taggedUserIds;
+        this.taggedKeywords = taggedKeywords;
     }
 
     public SavePostInput toInput(List<Long> postImageIds) {
@@ -36,6 +39,7 @@ public class SavePostRequest {
                 .content(content)
                 .postImageIds(postImageIds)
                 .taggedUserIds(taggedUserIds)
+                .taggedKeywords(taggedKeywords)
                 .build();
     }
 }

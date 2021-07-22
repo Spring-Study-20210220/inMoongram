@@ -1,6 +1,7 @@
 package com.team.post;
 
 import com.team.dbutil.DatabaseCleanup;
+import com.team.dbutil.PostData;
 import com.team.dbutil.UserData;
 import com.team.post.dto.request.SavePostRequest;
 import com.team.post.dto.response.SavePostResponse;
@@ -34,22 +35,22 @@ class PostAcceptanceTest {
     @Autowired
     private UserData userData;
 
+    @Autowired
+    private PostData postData;
+
     private User user1;
     private User user2;
     private User user3;
 
-    private MultipartFile postImage1;
-    private MultipartFile postImage2;
     String absolutePath;
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
+
         String path = "src/test/resources/images";
         absolutePath = new File(path).getAbsolutePath();
         user1 = userData.saveUser("testUser1", "testNickname1", "test1@test.com");
         user2 = userData.saveUser("testUser2", "testNickname2", "test2@test.com");
         user3 = userData.saveUser("testUser3", "testNickname3", "test3@test.com");
-        postImage1 = new MockMultipartFile("apple.jpeg", new FileInputStream(absolutePath+"/apple.jpeg"));
-        postImage2 = new MockMultipartFile("grape.jpeg", new FileInputStream(absolutePath+"/grape.jpeg"));
     }
 
     @AfterEach
@@ -58,12 +59,16 @@ class PostAcceptanceTest {
     }
 
     @Test
-    void 게시글_저장() {
+    void 게시글_저장() throws IOException {
+        MultipartFile postImage1 = new MockMultipartFile("apple.jpeg", new FileInputStream(absolutePath+"/apple.jpeg"));
+        MultipartFile postImage2 = new MockMultipartFile("grape.jpeg", new FileInputStream(absolutePath+"/grape.jpeg"));
+        String keyword = "inMoongram";
         SavePostRequest request = SavePostRequest.builder()
                 .userId(user1.getId())
                 .content("test-content")
                 .postImages(Arrays.asList(postImage1, postImage2))
                 .taggedUserIds(Arrays.asList(user2.getId(), user3.getId()))
+                .taggedKeywords(Arrays.asList(keyword))
                 .build();
 
         SavePostResponse response =
@@ -74,6 +79,7 @@ class PostAcceptanceTest {
                         .multiPart("content", request.getContent())
                         .multiPart("taggedUserIds", user2.getId())
                         .multiPart("taggedUserIds", user3.getId())
+                        .multiPart("taggedKeywords", keyword)
                         .multiPart("postImages", new File(absolutePath+"/apple.jpeg"))
                         .multiPart("postImages", new File(absolutePath+"/grape.jpeg"))
                         .log().all()
@@ -93,7 +99,21 @@ class PostAcceptanceTest {
         assertThat(response.getTaggedUserIds().size()).isEqualTo(2);
         assertThat(response.getTaggedUserIds().get(0)).isEqualTo(user2.getId());
         assertThat(response.getTaggedUserIds().get(1)).isEqualTo(user3.getId());
-
+        assertThat(response.getTaggedKeywords().size()).isEqualTo(1);
+        assertThat(response.getTaggedKeywords().get(0)).isEqualTo(keyword);
         // 테스트로 인해 저장된 파일 삭제
+    }
+
+    @Test
+    void 게시글_삭제() {
+        Post post = postData.savePost("test-content", user1);
+
+        given()
+                .port(port)
+                .accept("application/json")
+        .when()
+                .delete("/post/{post-id}", post.getId())
+        .then()
+                .statusCode(204);
     }
 }

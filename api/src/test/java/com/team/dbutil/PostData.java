@@ -14,8 +14,8 @@ public class PostData {
         this.postRepository = postRepository;
     }
 
-    public Post savePost(String content, User user) {
-        Post post = new Post(content, user);
+    public Post savePost(User user) {
+        Post post = new Post("content", user);
         postRepository.save(post);
         return post;
     }

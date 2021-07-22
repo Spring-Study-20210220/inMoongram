@@ -1,6 +1,5 @@
 package com.team.user;
 
-import com.team.user.dto.input.FollowInfoInput;
 import com.team.user.dto.output.FollowInfoOutput;
 import com.team.user.dto.request.FollowRequest;
 import com.team.user.dto.response.FollowInfoResponse;

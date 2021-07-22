@@ -5,11 +5,9 @@ import com.team.post.dto.request.SavePostRequest;
 import com.team.post.dto.response.SavePostResponse;
 import com.team.post.util.ImageUploader;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 
@@ -38,6 +36,13 @@ public class PostController {
         return ResponseEntity
                 .created(uriComponents.toUri())
                 .body(new SavePostResponse(output));
+    }
+
+    @DeleteMapping("/{post-id}")
+    public ResponseEntity<Void> deletePost(@PathVariable("post-id") Long postId) {
+        postService.delete(postId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .build();
     }
 
     private List<Long> saveImages(SavePostRequest request) {

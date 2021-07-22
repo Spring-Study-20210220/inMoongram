@@ -37,8 +37,8 @@ class PostImageServiceTest {
                 .password("testPassword")
                 .build();
 
-        postImage1 = new PostImage("image1.jpg", "11111111-1111-1111-1111-111111111111.jpg");
-        postImage2 = new PostImage("image2.jpg", "22222222-2222-2222-2222-222222222222.jpg");
+        postImage1 = new PostImage("image1.jpg", "11111111-1111-1111-1111-111111111111.jpg", "src/images/11111111-1111-1111-1111-111111111111.jpg");
+        postImage2 = new PostImage("image2.jpg", "22222222-2222-2222-2222-222222222222.jpg", "src/images/22222222-2222-2222-2222-222222222222.jpg");
     }
 
     @Test

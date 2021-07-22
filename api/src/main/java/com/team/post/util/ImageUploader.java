@@ -28,8 +28,9 @@ public class ImageUploader {
         }
         String uploadFileName = multipartFile.getOriginalFilename();
         String storeFileName = createStoreFileName(uploadFileName);
-        multipartFile.transferTo(new File(getFullPath(storeFileName)));
-        return postImageService.save(new PostImage(uploadFileName, storeFileName));
+        String storePath = getFullPath(storeFileName);
+        multipartFile.transferTo(new File(storePath));
+        return postImageService.save(new PostImage(uploadFileName, storeFileName, storePath));
     }
 
     public List<PostImage> storeImages(List<MultipartFile> multipartFiles) {

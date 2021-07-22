@@ -5,7 +5,7 @@ import com.team.dbutil.PostData;
 import com.team.dbutil.UserData;
 import com.team.post.dto.request.PostLikeCreateRequest;
 import com.team.post.dto.response.PostLikeCreateResponse;
-import com.team.post.dto.response.PostLikeInfoListResponse;
+import com.team.post.dto.response.PostLikeInfoResponse;
 import com.team.user.User;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.AfterEach;
@@ -14,8 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
-
-import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -117,7 +115,7 @@ class PostLikeAcceptanceTest {
         .thenReturn();
 
         assertThat(response.getStatusCode()).isEqualTo(200);
-        var responseList = response.as(PostLikeInfoListResponse.class).getPostLikes();
+        var responseList = response.as(PostLikeInfoResponse.class).getPostLikes();
         assertThat(responseList.size()).isEqualTo(3);
     }
 }

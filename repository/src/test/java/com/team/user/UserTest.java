@@ -1,14 +1,17 @@
 package com.team.user;
 
+import com.team.config.TestConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
 import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@Import(TestConfig.class)
 class UserTest {
     @Autowired
     private UserRepository userRepository;

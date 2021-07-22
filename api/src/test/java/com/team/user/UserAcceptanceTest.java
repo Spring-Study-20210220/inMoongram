@@ -4,10 +4,12 @@ import com.team.QueryConfig;
 import com.team.dbutil.DatabaseCleanup;
 import com.team.dbutil.FollowData;
 import com.team.dbutil.UserData;
+import com.team.post.dto.response.FeedResponse;
 import com.team.user.dto.output.FollowListOutput;
 import com.team.user.dto.request.UserProfileModificationRequest;
 import com.team.user.dto.response.FollowerInfoListResponse;
 import com.team.user.dto.response.FollowerInfoResponse;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -22,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.util.StopWatch;
 
 import java.util.*;
+import java.io.File;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -215,5 +218,52 @@ class UserAcceptanceTest {
         assertThat(response.getUsers().get(1).getName()).isEqualTo(user3.getName());
         assertThat(response.getUsers().get(1).getNickname()).isEqualTo(user3.getNickname());
         assertThat(response.getUsers().get(1).getFollowId()).isEqualTo(follow2.getId());
+    }
+
+    @Test
+    void 피드_조회() {
+        User user1 = userData.saveUser("testUser1", "testNickname1", "test1@test.com");
+        User user2 = userData.saveUser("testUser2", "testNickname2", "test2@test.com");
+        User user3 = userData.saveUser("testUser3", "testNickname3", "test3@test.com");
+        User user4 = userData.saveUser("testUser4", "testNickname4", "test4@test.com");
+
+        Follow follow1 = followData.saveFollow(user1, user2);
+        Follow follow2 = followData.saveFollow(user1, user3);
+
+        savePost(user2, "first");
+        savePost(user3, "second");
+        savePost(user4, "third");
+        savePost(user2, "fourth");
+
+        FeedResponse response =
+                given()
+                        .port(port)
+                        .accept("application/json")
+                        .param("page-no", 1)
+                        .when()
+                        .get("/user/{user-id}/feed", user1.getId())
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .as(FeedResponse.class);
+
+        assertThat(response.getFeedInfos().size()).isEqualTo(3);
+        assertThat(response.getFeedInfos().get(0).getContent()).isEqualTo("fourth");
+        assertThat(response.getFeedInfos().get(1).getContent()).isEqualTo("second");
+        assertThat(response.getFeedInfos().get(2).getContent()).isEqualTo("first");
+    }
+
+    private void savePost(User user, String content) {
+        String path = "src/test/resources/images";
+        String absolutePath = new File(path).getAbsolutePath();
+        given()
+                .port(port)
+                .accept(ContentType.JSON)
+                .multiPart("userId", user.getId())
+                .multiPart("content", content)
+                .multiPart("postImages", new File(absolutePath+"/apple.jpeg"))
+        .when()
+                .post("/post")
+        .then();
     }
 }

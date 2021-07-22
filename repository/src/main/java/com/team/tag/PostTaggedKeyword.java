@@ -24,7 +24,7 @@ public class PostTaggedKeyword {
     @JoinColumn(name = "tag_keyword_id")
     private TagKeyword tagKeyword;
 
-    public PostTaggedKeyword(Post post, TagKeyword tagKeyword) {
+    public PostTaggedKeyword(TagKeyword tagKeyword, Post post) {
         this.post = post;
         this.tagKeyword = tagKeyword;
     }

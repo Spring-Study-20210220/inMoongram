@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public class PostScrapServiceTest {
+class PostScrapServiceTest {
     @Mock
     private PostScrapRepository postScrapRepository;
     @Mock
@@ -42,11 +42,11 @@ public class PostScrapServiceTest {
     @BeforeEach
     void setUp() {
         user = User.builder()
+                .id(1L)
                 .name("백승화")
                 .email("a@naver.com")
                 .nickname("peach")
                 .build();
-        user.setIdForTest(1L);
         post = new Post("hello" ,user);
         post2 = new Post("hello2" ,user);
         postScrap = new PostScrap(user, post);
