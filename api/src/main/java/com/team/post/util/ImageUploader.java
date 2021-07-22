@@ -3,7 +3,6 @@ package com.team.post.util;
 import com.team.post.PostImage;
 import com.team.post.PostImageService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;

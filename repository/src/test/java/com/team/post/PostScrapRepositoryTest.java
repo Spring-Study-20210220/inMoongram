@@ -14,7 +14,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @DataJpaTest
-public class PostScrapRepositoryTest {
+class PostScrapRepositoryTest {
 
     @Autowired
     private PostScrapRepository postScrapRepository;

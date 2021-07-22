@@ -24,7 +24,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class PostScrapAcceptanceTest {
+class PostScrapAcceptanceTest {
 
     @LocalServerPort
     private int port;
