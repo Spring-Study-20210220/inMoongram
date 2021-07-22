@@ -11,6 +11,7 @@ import com.team.user.dto.response.FollowerInfoResponse;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.util.StopWatch;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,6 +66,33 @@ class UserAcceptanceTest {
             Assertions.assertThat(actual.get(i).getUserId()).isEqualTo(expected.get(i).getId());
             Assertions.assertThat(actual.get(i).getName()).isEqualTo(expected.get(i).getName());
             Assertions.assertThat(actual.get(i).getNickName()).isEqualTo(expected.get(i).getNickname());
+        }
+    }
+
+    @Test
+    @Disabled
+    void 유저_1만건_팔로워_테스트() {
+        User user = userData.saveUser("승화", "a", "a@naver.com");
+        int max = 10000;
+        List<User> users = new ArrayList<>();
+        for(int i = 0; i < max; i++) {
+            users.add(userData.saveUser("승화"+i, "a"+i, "a"+i+"@naver.com"));
+        }
+        List<Follow> follows = new ArrayList<>();
+        for(int i = 0; i < max; i++) {
+            follows.add(followData.saveFollow(users.get(i), user));
+        }
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        List<FollowerInfoResponse> actual = getFollowerTest(user.getId());
+        stopWatch.stop();
+        System.out.println(stopWatch.prettyPrint());
+        actual.sort(Comparator.comparingLong(FollowerInfoResponse::getUserId));
+        Assertions.assertThat(actual.size()).isEqualTo(users.size());
+        for (int i = 0; i < actual.size(); i++) {
+            Assertions.assertThat(actual.get(i).getUserId()).isEqualTo(users.get(i).getId());
+            Assertions.assertThat(actual.get(i).getName()).isEqualTo(users.get(i).getName());
+            Assertions.assertThat(actual.get(i).getNickName()).isEqualTo(users.get(i).getNickname());
         }
     }
 
