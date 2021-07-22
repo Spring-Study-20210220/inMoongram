@@ -8,14 +8,14 @@ import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostLikeInfoListResponse {
+public class PostLikeInfoResponse {
     private List<PostLikeInfo> postLikes;
 
-    public PostLikeInfoListResponse(List<PostLikeInfo> postLikes) {
+    public PostLikeInfoResponse(List<PostLikeInfo> postLikes) {
         this.postLikes = postLikes;
     }
 
-    public PostLikeInfoListResponse(PostLikeInfoOutput output) {
+    public PostLikeInfoResponse(PostLikeInfoOutput output) {
         this.postLikes = output.getPostLikeInfoList().stream()
             .map(
                     it-> PostLikeInfo.builder()

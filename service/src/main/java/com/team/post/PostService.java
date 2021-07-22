@@ -1,5 +1,6 @@
 package com.team.post;
 
+import com.team.exception.IdNotFoundException;
 import com.team.post.dto.input.SavePostInput;
 import com.team.post.dto.output.SavePostOutput;
 import com.team.tag.PostTaggedUser;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,16 +37,13 @@ public class PostService {
     }
 
     private void tagUsers(SavePostInput input, Post post) {
-        List<User> taggedUsers = getTaggedUsers(input.getTaggedUserIds());
+        List<User> taggedUsers = userService.findUsersByIds(input.getTaggedUserIds());
         List<PostTaggedUser> postTaggedUsers = taggedUserService.tagAll(taggedUsers, post);
         post.addTaggedUsers(postTaggedUsers);
     }
 
-    private List<User> getTaggedUsers(List<Long> userIds) {
-        return userIds.stream()
-                .map(userService::findUserById)
-                .collect(Collectors.toList());
+    public Post findPostById(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(IdNotFoundException::new);
     }
-
-
 }

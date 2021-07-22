@@ -7,7 +7,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -29,7 +28,7 @@ public class Post {
     private LocalDateTime createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @OneToMany(mappedBy = "post")
@@ -48,33 +47,35 @@ public class Post {
         this.content = content;
         setAuthor(user);
     }
-    public void setIdForTest(Long id){
-        this.id=id;
+
+    public void setIdForTest(Long id) {
+        this.id = id;
     }
-    private void setAuthor(User user){
+
+    private void setAuthor(User user) {
         this.user = user;
         user.getPosts().add(this);
     }
 
-    public void addLike(PostLike postLike){
+    public void addLike(PostLike postLike) {
         this.postLikes.add(postLike);
     }
 
-    public void addTaggedUsers(List<PostTaggedUser> postTaggedUsers){
+    public void addTaggedUsers(List<PostTaggedUser> postTaggedUsers) {
         this.postTaggedUsers.addAll(postTaggedUsers);
         postTaggedUsers.forEach(
-                it->it.setPost(this)
+                it -> it.setPost(this)
         );
     }
 
-    public void addComment(Comment comment){
+    public void addComment(Comment comment) {
         this.comments.add(comment);
     }
 
-    public void addImages(List<PostImage> postImages){
+    public void addImages(List<PostImage> postImages) {
         this.postImages.addAll(postImages);
         postImages.forEach(
-                it->it.setPost(this)
+                it -> it.setPost(this)
         );
     }
 }

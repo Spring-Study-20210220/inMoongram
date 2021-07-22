@@ -3,7 +3,7 @@ package com.team.post;
 import com.team.post.dto.input.PostLikeInfoInput;
 import com.team.post.dto.request.PostLikeCreateRequest;
 import com.team.post.dto.response.PostLikeCreateResponse;
-import com.team.post.dto.response.PostLikeInfoListResponse;
+import com.team.post.dto.response.PostLikeInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,11 +47,11 @@ public class PostLikeController {
     }
 
     @GetMapping("{postId}/likes")
-    public ResponseEntity<PostLikeInfoListResponse> getLikes(@PathVariable("postId")Long postId){
+    public ResponseEntity<PostLikeInfoResponse> getLikes(@PathVariable("postId")Long postId){
         var output = postLikeService.getPostLikeList(
                 new PostLikeInfoInput(postId)
         );
         return ResponseEntity
-                .ok(new PostLikeInfoListResponse(output));
+                .ok(new PostLikeInfoResponse(output));
     }
 }

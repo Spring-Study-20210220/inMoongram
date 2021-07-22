@@ -20,17 +20,15 @@ public class SavePostOutput {
     private List<String> postImages;
     private List<Long> taggedUserIds;
     private LocalDateTime createdAt;
-    private LocalDateTime lastModified;
 
     @Builder
-    public SavePostOutput(Long userId, Long postId, String content, List<String> postImages, List<Long> taggedUserIds, LocalDateTime createdAt, LocalDateTime lastModified) {
+    public SavePostOutput(Long userId, Long postId, String content, List<String> postImages, List<Long> taggedUserIds, LocalDateTime createdAt) {
         this.userId = userId;
         this.postId = postId;
         this.content = content;
         this.postImages = postImages;
         this.taggedUserIds = taggedUserIds;
         this.createdAt = createdAt;
-        this.lastModified = lastModified;
     }
 
     public SavePostOutput(Post post) {
@@ -40,6 +38,5 @@ public class SavePostOutput {
         this.postImages = post.getPostImages().stream().map(PostImage::getUploadFileName).collect(Collectors.toList());
         this.taggedUserIds = post.getPostTaggedUsers().stream().map(it -> it.getUser().getId()).collect(Collectors.toList());
         this.createdAt = post.getCreatedAt();
-        this.lastModified = post.getLastModified();
     }
 }

@@ -17,7 +17,6 @@ public class SavePostResponse {
     private List<String> postImages;
     private List<Long> taggedUserIds;
     private LocalDateTime createdAt;
-    private LocalDateTime lastModified;
 
     public SavePostResponse(SavePostOutput output) {
         this.userId = output.getUserId();
@@ -26,6 +25,5 @@ public class SavePostResponse {
         this.postImages = output.getPostImages();
         this.taggedUserIds = output.getTaggedUserIds();
         this.createdAt = output.getCreatedAt();
-        this.lastModified = output.getLastModified();
     }
 }

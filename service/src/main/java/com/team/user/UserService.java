@@ -68,9 +68,17 @@ public class UserService {
         return new FollowListOutput(userInfos, null);
     }
 
+    @Transactional
     public User findUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(IdNotFoundException::new);
+    }
+
+    @Transactional
+    public List<User> findUsersByIds(List<Long> userIds){
+        return userIds.stream()
+                .map(this::findUserById)
+                .collect(Collectors.toList());
     }
 
     @Transactional
