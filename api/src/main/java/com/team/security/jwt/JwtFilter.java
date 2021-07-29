@@ -68,7 +68,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
                     String newAccessToken = tokenProvider.createAccessToken(authentication);
 
-                    Cookie newAccessTokenCookie = cookieUtil.createCookie("accessToken", newAccessToken, TokenProvider.ACCESS_TOKEN_VALID_TIME);
+                    long accessTokenExpireTimeInSeconds = TokenProvider.ACCESS_TOKEN_VALID_TIME / 1000;
+                    Cookie newAccessTokenCookie = cookieUtil.createCookie("accessToken", newAccessToken, accessTokenExpireTimeInSeconds);
                     response.addCookie(newAccessTokenCookie);
                 }
             }

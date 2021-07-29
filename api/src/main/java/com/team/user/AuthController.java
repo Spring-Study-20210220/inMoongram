@@ -9,6 +9,7 @@ import com.team.user.dto.response.SignupResponse;
 import com.team.util.CookieUtil;
 import com.team.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -57,16 +58,32 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String accessToken = tokenProvider.createAccessToken(authentication);
-        Cookie accessTokenCookie = cookieUtil.createCookie("accessToken", accessToken, TokenProvider.ACCESS_TOKEN_VALID_TIME);
+        long accessTokenExpireTimeInSeconds = TokenProvider.ACCESS_TOKEN_VALID_TIME / 1000;
+        Cookie accessTokenCookie = cookieUtil.createCookie("accessToken", accessToken, accessTokenExpireTimeInSeconds);
 
         String refreshToken = tokenProvider.createRefreshToken(authentication);
-        Cookie refreshTokenCookie = cookieUtil.createCookie("refreshToken", refreshToken, TokenProvider.REFRESH_TOKEN_VALID_TIME);
+        long refreshTokenExpireTimeInSeconds = TokenProvider.REFRESH_TOKEN_VALID_TIME / 1000;
+        Cookie refreshTokenCookie = cookieUtil.createCookie("refreshToken", refreshToken, refreshTokenExpireTimeInSeconds);
 
-        redisUtil.setDataExpire(refreshToken, request.getEmail(), TokenProvider.REFRESH_TOKEN_VALID_TIME);
+        redisUtil.setDataExpire(refreshToken, request.getEmail(), refreshTokenExpireTimeInSeconds);
 
         httpResponse.addCookie(accessTokenCookie);
         httpResponse.addCookie(refreshTokenCookie);
 
         return ResponseEntity.ok(new LoginResponse(accessToken));
+    }
+
+    @PostMapping("/signout")
+    public ResponseEntity<Void> logout(HttpServletResponse httpResponse) {
+        expireTokenCookie(httpResponse, "accessToken");
+        expireTokenCookie(httpResponse, "refreshToken");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .build();
+    }
+
+    private void expireTokenCookie(HttpServletResponse httpResponse, String cookieName) {
+        Cookie cookie = new Cookie(cookieName, null);
+        cookie.setMaxAge(0);
+        httpResponse.addCookie(cookie);
     }
 }
