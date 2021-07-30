@@ -44,7 +44,7 @@ class PostLikeAcceptanceTest {
         User author = userData.saveUser("승화", "a", "a@naver.com");
         User likeUser = userData.saveUser("준수", "b", "b@naver.com");
 
-        Post post = postData.savePost("content", author);
+        Post post = postData.savePost(author);
 
         var request = new PostLikeCreateRequest(likeUser.getId());
 
@@ -84,7 +84,7 @@ class PostLikeAcceptanceTest {
 
     public Long getPostTest(String userName,String nickName){
         User author = userData.saveUser(userName, nickName, "a@naver.com");
-        Post post = postData.savePost("content",author);
+        Post post = postData.savePost(author);
         return post.getId();
     }
 

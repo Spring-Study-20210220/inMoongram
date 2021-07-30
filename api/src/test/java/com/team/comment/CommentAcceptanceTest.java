@@ -50,7 +50,7 @@ class CommentAcceptanceTest {
         postAuthor = userData.saveUser("준수", "b", "b@naver.com");
         taggedUser1 = userData.saveUser("용우", "c", "c@naver.com");
         taggedUser2 = userData.saveUser("원식", "d", "d@naver.com");
-        post = postData.savePost("content", postAuthor);
+        post = postData.savePost(postAuthor);
         testPostId = post.getId();
     }
 
@@ -64,7 +64,7 @@ class CommentAcceptanceTest {
     void 댓글생성() {
         User author = userData.saveUser("승화", "a", "a@naver.com");
         User commentWriter = userData.saveUser("준수", "b", "b@naver.com");
-        Post post = postData.savePost("content", author);
+        Post post = postData.savePost(author);
 
         var request = CommentSaveRequest.builder()
                 .writerId(commentWriter.getId())

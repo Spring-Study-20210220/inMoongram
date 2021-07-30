@@ -106,7 +106,7 @@ class PostAcceptanceTest {
 
     @Test
     void 게시글_삭제() {
-        Post post = postData.savePost("test-content", user1);
+        Post post = postData.savePost(user1);
 
         given()
                 .port(port)

@@ -1,7 +1,6 @@
 package com.team.post;
 
 import com.team.exception.IdNotFoundException;
-
 import com.team.post.dto.input.FeedInput;
 import com.team.post.dto.input.SavePostInput;
 import com.team.post.dto.output.FeedOutput;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
