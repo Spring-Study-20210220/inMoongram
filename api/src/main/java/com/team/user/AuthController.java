@@ -77,14 +77,14 @@ public class AuthController {
 
     @PostMapping("/signout")
     public ResponseEntity<Void> logout(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        expireTokenCookie(httpResponse, "accessToken");
-        expireTokenCookie(httpResponse, "refreshToken");
-
         Arrays.stream(httpRequest.getCookies())
                 .filter(cookie -> cookie.getName().equals("refreshToken"))
                 .map(Cookie::getValue)
                 .findFirst()
                 .ifPresent(redisUtil::deleteData);
+
+        expireTokenCookie(httpResponse, "accessToken");
+        expireTokenCookie(httpResponse, "refreshToken");
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .build();
@@ -93,6 +93,7 @@ public class AuthController {
     @GetMapping("/verify/{key}")
     public ResponseEntity<String> verifyEmail(@PathVariable("key") String key) {
         if (authService.verifyEmail(key)) {
+            // TODO 유저 권한 부여 설정
             return ResponseEntity.ok("이메일을 성공적으로 인증했습니다.");
         } else {
             return ResponseEntity.badRequest()
