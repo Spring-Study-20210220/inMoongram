@@ -1,10 +1,12 @@
 package com.team.post;
 
+import com.team.event.PostCreateEvent;
 import com.team.post.dto.output.SavePostOutput;
 import com.team.post.dto.request.SavePostRequest;
 import com.team.post.dto.response.SavePostResponse;
 import com.team.post.util.ImageUploader;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +14,6 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import org.springframework.web.util.UriComponents;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -21,13 +21,14 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 @RequestMapping("/post")
 @RequiredArgsConstructor
 public class PostController {
+    private final ApplicationEventPublisher publisher;
     private final ImageUploader uploader;
     private final PostService postService;
 
     @PostMapping(value = "")
     public ResponseEntity<SavePostResponse> savePost(@Valid @ModelAttribute SavePostRequest request) {
-        List<Long> postImageIds = saveImages(request);
-        SavePostOutput output = postService.save(request.toInput(postImageIds));
+        SavePostOutput output = postService.save(request.toInput());
+        publisher.publishEvent(new PostCreateEvent(output.getPostId(), request.getPostImages()));
 
         UriComponents uriComponents = MvcUriComponentsBuilder
                 .fromMethodCall(on(PostController.class).savePost(request))
@@ -43,12 +44,5 @@ public class PostController {
         postService.delete(postId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .build();
-    }
-
-    private List<Long> saveImages(SavePostRequest request) {
-        List<PostImage> postImages = uploader.storeImages(request.getPostImages());
-        return postImages.stream()
-                .map(PostImage::getId)
-                .collect(Collectors.toList());
     }
 }

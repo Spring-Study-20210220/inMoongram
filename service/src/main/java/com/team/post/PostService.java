@@ -31,7 +31,6 @@ public class PostService {
         Post post = new Post(input.getContent(), user);
         Post savePost = postRepository.save(post);
 
-        addImages(input, savePost);
         tagUsers(input, savePost);
         tagKeywords(input, savePost);
         return new SavePostOutput(savePost);
@@ -47,11 +46,6 @@ public class PostService {
                 .orElseThrow(IdNotFoundException::new);
         post.delete();
         postRepository.delete(post);
-    }
-
-    private void addImages(SavePostInput input, Post post) {
-        List<PostImage> findImages = postImageService.findImagesByIds(input.getPostImageIds());
-        post.addImages(findImages);
     }
 
     private void tagUsers(SavePostInput input, Post post) {

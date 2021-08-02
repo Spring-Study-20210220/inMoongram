@@ -41,7 +41,6 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<SignupResponse> signup(@Valid @RequestBody SignupRequest request) {
         SignupOutput output = userService.signup(request.toInput());
-        authService.sendVerificationMail(request.getEmail(), request.getNickname());
         UriComponents uriComponents = MvcUriComponentsBuilder
                 .fromMethodCall(on(AuthController.class).signup(request))
                 .build();

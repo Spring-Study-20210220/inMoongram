@@ -1,11 +1,16 @@
 package com.team.post.util;
 
+import com.team.event.PostCreateEvent;
+import com.team.post.Post;
 import com.team.post.PostImage;
 import com.team.post.PostImageService;
+import com.team.post.PostService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -16,7 +21,9 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
+@Transactional
 public class ImageUploader {
+    private final PostService postService;
     private final PostImageService postImageService;
 
     @Value("${file.dir}")
@@ -33,9 +40,11 @@ public class ImageUploader {
         return postImageService.save(new PostImage(uploadFileName, storeFileName, storePath));
     }
 
-    public List<PostImage> storeImages(List<MultipartFile> multipartFiles) {
+    @Async
+    @EventListener
+    public void storeImages(PostCreateEvent event) {
         List<PostImage> postImages = new ArrayList<>();
-        multipartFiles.stream()
+        event.getMultipartFiles().stream()
                 .filter(it -> !it.isEmpty())
                 .forEach(it -> {
                     try {
@@ -44,7 +53,9 @@ public class ImageUploader {
                         e.printStackTrace();
                     }
                 });
-        return postImages;
+
+        Post post = postService.findPostById(event.getPostId());
+        post.addImages(postImages);
     }
 
     private String createStoreFileName(String uploadFileName) {
