@@ -1,0 +1,34 @@
+file:
+  dir: src/test/resources/images
+
+jwt:
+  secret: WTB1X2M0bnRfTDBva190aDFzX3NlY3IzdF9LM3lfUjFnaHQ/MTIzMjEwMTAxMTAxMjEyMTIxMzEzMTMxMzEzMQ==
+
+
+spring:
+  redis:
+    port: 6379
+    host: localhost
+    password:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: emailAddress
+    password: password
+    properties:
+      mail:
+        stmp:
+          auth: true
+          starttls:
+            enable: true
+  security:
+    oauth2:
+      client:
+        registration:
+          facebook:
+            client-id: 1112066859202583
+            client-secret: ae30279a5c9c1fc949cb12a0e7e1db0b
+            authorization-grant-type: authorization_code
+        provider:
+          facebook:
+            token-uri: https://graph.facebook.com/v11.0/oauth/access_token
