@@ -1,6 +1,8 @@
 package com.team.user;
 
+import com.team.user.dto.input.UserInfoInput;
 import com.team.user.dto.output.FollowListOutput;
+import com.team.user.dto.output.UserInfoOutput;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +14,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -22,6 +25,7 @@ class UserServiceTest {
     @InjectMocks
     UserService userService;
 
+    private User user;
     private User user1;
     private User user2;
     private User user3;
@@ -31,6 +35,18 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
+        user = User.builder()
+                .name("testUser")
+                .nickname("testNickName")
+                .email("test@test.com")
+                .password("1234")
+                .sex(Sex.MALE)
+                .phoneNumber("010-2222-3333")
+                .website("www.naver.com")
+                .introduction("안녕하세요")
+                .profileImage("1111")
+                .build();
+        user.setIdForTest(1L);
         user1 = User.builder()
                 .name("testUser1")
                 .nickname("testNickname1")
@@ -73,5 +89,15 @@ class UserServiceTest {
 
 //        TODO: follow Hashtag test
 //        assertThat(followList.getHashtags().size()).isEqualTo(1);
+    }
+
+    @Test
+    void 유저_정보_조회() {
+        Long userId = 1L;
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+
+        UserInfoOutput result = userService.getUserInfo(new UserInfoInput(userId));
+
+        assertThat(result.getEmail()).isEqualTo(user.getEmail());
     }
 }

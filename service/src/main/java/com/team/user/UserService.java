@@ -1,12 +1,11 @@
 package com.team.user;
 
 import com.team.exception.IdNotFoundException;
-import com.team.user.dto.input.FollowerInfoListInput;
-import com.team.user.dto.input.SignupInput;
-import com.team.user.dto.input.UserProfileModificationInput;
+import com.team.user.dto.input.*;
 import com.team.user.dto.output.FollowListOutput;
 import com.team.user.dto.output.FollowerInfoListOutput;
 import com.team.user.dto.output.SignupOutput;
+import com.team.user.dto.output.UserInfoOutput;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,6 +41,13 @@ public class UserService {
         );
 
         return new SignupOutput(saveUser);
+    }
+
+    @Transactional
+    public UserInfoOutput getUserInfo(UserInfoInput input) {
+        User user = userRepository.findById(input.getUserId())
+                .orElseThrow(IdNotFoundException::new);
+        return new UserInfoOutput(user);
     }
 
     @Transactional
