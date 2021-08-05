@@ -1,7 +1,12 @@
 package com.team.security.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team.security.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.team.security.OAuth2AuthenticationFailureHandler;
+import com.team.security.OAuth2AuthenticationSuccessHandler;
 import com.team.security.jwt.JwtAuthenticationEntryPoint;
 import com.team.security.jwt.TokenProvider;
+import com.team.user.UserService;
 import com.team.util.CookieUtil;
 import com.team.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
@@ -10,11 +15,30 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.RequestCacheConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.savedrequest.CookieRequestCache;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.RequestCache;
 
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -22,35 +46,93 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final RedisUtil redisUtil;
     private final CookieUtil cookieUtil;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final ObjectMapper objectMapper;
+    private final OAuth2AuthorizedClientRepository clientRepository;
+    private final com.team.user.OAuth2UserService userService;
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
-
-                .exceptionHandling()
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                )
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .exceptionHandling(handling -> handling
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                )
+                .sessionManagement(management -> management
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authorizeRequests(authorize -> authorize
+                        .antMatchers( "/oauth2/login", "/login", "signup", "/verify/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .apply(new JwtSecurityConfig(tokenProvider, redisUtil, cookieUtil))
                 .and()
-                .headers()
-                .frameOptions()
-                .sameOrigin()
+                .oauth2Login(login -> login
+                        .authorizationEndpoint(endPoint -> endPoint
+                                .authorizationRequestRepository(customRequest())
+                        )
+                        .successHandler(successHandler())
+                        .failureHandler(failureHandler())
+                )
+                .requestCache(RequestCacheConfigurer::disable);
 
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+    }
 
-                .and()
-                .authorizeRequests()
-                .antMatchers("/login", "/signup", "/verify/**").permitAll()
-                .anyRequest().authenticated()
+    @Bean
+    public OAuth2AuthenticationSuccessHandler successHandler() {
+        return OAuth2AuthenticationSuccessHandler.builder()
+                .clientRepository(clientRepository)
+                .cookieUtil(cookieUtil)
+                .oAuth2UserService(oAuth2UserService())
+                .redisUtil(redisUtil)
+                .tokenProvider(tokenProvider)
+                .userService(userService)
+                .build();
+    }
 
-                .and()
-                .apply(new JwtSecurityConfig(tokenProvider, redisUtil, cookieUtil));
+    @Bean
+    public OAuth2AuthenticationFailureHandler failureHandler() {
+        return new OAuth2AuthenticationFailureHandler();
+    }
+
+    @Bean
+    public RequestCache cookieRequestCache() {
+        return new CookieRequestCache();
+    }
+
+    @Bean
+    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> customRequest() {
+        return new HttpCookieOAuth2AuthorizationRequestRepository(objectMapper, cookieUtil);
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService() {
+        return new DefaultOAuth2UserService();
+    }
+
+    @Bean
+    public OAuth2AuthorizedClientManager authorizedClientManager(
+            ClientRegistrationRepository clientRegistrationRepository,
+            OAuth2AuthorizedClientRepository authorizedClientRepository) {
+
+        OAuth2AuthorizedClientProvider authorizedClientProvider = OAuth2AuthorizedClientProviderBuilder.builder()
+                .authorizationCode()
+                .build();
+
+        DefaultOAuth2AuthorizedClientManager authorizedClientManager = new DefaultOAuth2AuthorizedClientManager(
+                clientRegistrationRepository,
+                authorizedClientRepository);
+        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+
+        return authorizedClientManager;
     }
 }
