@@ -28,6 +28,6 @@ tasks.compileJava {
     options.generatedSourceOutputDirectory.set(file(generated))
 }
 
-tasks.clean {
+tasks.named("clean") {
     file(generated).delete()
 }
