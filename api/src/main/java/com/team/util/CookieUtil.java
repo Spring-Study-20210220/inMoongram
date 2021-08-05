@@ -10,6 +10,7 @@ import java.util.Arrays;
 public class CookieUtil {
     public Cookie createCookie(String cookieName, String accessToken, long maxAge) {
         Cookie token = new Cookie(cookieName, accessToken);
+        token.setPath("/");
         token.setHttpOnly(true);
         token.setSecure(true);
         token.setMaxAge((int) maxAge);

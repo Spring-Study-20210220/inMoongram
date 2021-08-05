@@ -40,8 +40,16 @@ public class TokenProvider implements InitializingBean {
         return generateToken(authentication, ACCESS_TOKEN_VALID_TIME);
     }
 
+    public String createAccessToken(String email, String principalName) {
+        return generateToken(email, principalName, ACCESS_TOKEN_VALID_TIME);
+    }
+
     public String createRefreshToken(Authentication authentication) {
         return generateToken(authentication, REFRESH_TOKEN_VALID_TIME);
+    }
+
+    public String createRefreshToken(String email, String principalName) {
+        return generateToken(email, principalName, REFRESH_TOKEN_VALID_TIME);
     }
 
     public Authentication getAuthentication(String token) {
@@ -94,4 +102,19 @@ public class TokenProvider implements InitializingBean {
         log.info("createToken: {}, expiration: {}", token, expiration);
         return token;
     }
+
+    private String generateToken(String email, String principalName, long expireTime) {
+        long now = (new Date()).getTime();
+        Date expiration = new Date(now + expireTime);
+
+        String token = Jwts.builder()
+                .setSubject(principalName)
+                .claim("email", email)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(expiration)
+                .compact();
+        log.info("createToken: {}, expiration: {}", token, expiration);
+        return token;
+    }
+
 }
