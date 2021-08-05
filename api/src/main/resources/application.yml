@@ -26,8 +26,8 @@ spring:
       client:
         registration:
           facebook:
-            client-id: 1112066859202583
-            client-secret: ae30279a5c9c1fc949cb12a0e7e1db0b
+            client-id: [client-id]
+            client-secret: [client-sercret]
             authorization-grant-type: authorization_code
         provider:
           facebook:
