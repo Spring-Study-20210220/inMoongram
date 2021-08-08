@@ -17,7 +17,7 @@ import java.util.UUID;
 public class AuthService {
     private final EmailService emailService;
     private final RedisUtil redisUtil;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
@@ -28,13 +28,11 @@ public class AuthService {
         emailService.mailSend(event.getEmail(), "[inMoongram] 회원가입 인증메일입니다.", VERIFICATION_LINK + uuid.toString());
     }
 
-    public Boolean verifyEmail(String key) {
+    public void verifyEmail(String key) {
         String savedNickname = redisUtil.getData(key);
-        if (userRepository.findByNickname(savedNickname).orElse(null) == null) {
-            return false;
-        }
+        User user = userService.findByNickname(savedNickname);
+        user.modifyRole(UserRole.ROLE_USER);
         redisUtil.deleteData(key);
-        return true;
     }
 
 }

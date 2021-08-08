@@ -1,5 +1,6 @@
 package com.team.security.config;
 
+import com.team.security.jwt.JwtAccessDeniedHandler;
 import com.team.security.jwt.JwtAuthenticationEntryPoint;
 import com.team.security.jwt.TokenProvider;
 import com.team.util.CookieUtil;
@@ -22,6 +23,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final RedisUtil redisUtil;
     private final CookieUtil cookieUtil;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -30,6 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .accessDeniedHandler(jwtAccessDeniedHandler)
 
                 .and()
                 .headers()
@@ -43,7 +46,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/login", "/signup", "/verify/**").permitAll()
-                .anyRequest().authenticated()
+                .antMatchers("/signout").hasAnyAuthority("ROLE_NOT_PERMITTED", "ROLE_USER")
+                .anyRequest().hasAuthority("ROLE_USER")
 
                 .and()
                 .apply(new JwtSecurityConfig(tokenProvider, redisUtil, cookieUtil));
