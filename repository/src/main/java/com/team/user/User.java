@@ -45,8 +45,8 @@ public class User {
     @Column(name = "profile_image")
     private String profileImage;
 
-    @Enumerated(EnumType.STRING)
-    private UserRole role = UserRole.ROLE_NOT_PERMITTED;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Authority authority;
 
     // 사용자를 팔로우 하는 사람들
     @OneToMany(mappedBy = "followee")
@@ -95,7 +95,7 @@ public class User {
     }
 
     public void modifyRole(UserRole role) {
-        this.role = role;
+        this.authority.updateRole(role);
     }
 
     public void setIdForTest(Long id) {

@@ -9,17 +9,13 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -50,12 +46,8 @@ public class TokenProvider implements InitializingBean {
 
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaimsJws(token).getBody();
-        Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get("authority").toString().split(","))
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-        User principle = new User(claims.getSubject(), "", authorities);
-        return new UsernamePasswordAuthenticationToken(principle, token, authorities);
+        User principle = new User(claims.getSubject(), "", new ArrayList<>());
+        return new UsernamePasswordAuthenticationToken(principle, token, new ArrayList<>());
     }
 
     public String getUsername(String token) {
@@ -89,10 +81,6 @@ public class TokenProvider implements InitializingBean {
     }
 
     private String generateToken(Authentication authentication, long expireTime) {
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-
         long now = (new Date()).getTime();
         Date expiration = new Date(now + expireTime);
 
@@ -100,7 +88,6 @@ public class TokenProvider implements InitializingBean {
         String token = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("email", userDetails.getUsername())
-                .claim("authority", authorities)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(expiration)
                 .compact();
