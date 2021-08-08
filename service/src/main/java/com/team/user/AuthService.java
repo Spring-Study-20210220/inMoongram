@@ -1,5 +1,4 @@
 package com.team.user;
-
 import com.team.auth.EmailService;
 import com.team.event.SignupEvent;
 import com.team.util.RedisUtil;

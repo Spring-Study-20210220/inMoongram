@@ -1,5 +1,6 @@
 package com.team.user;
 
+import com.team.event.SignupEvent;
 import com.team.exception.IdNotFoundException;
 import com.team.user.dto.input.UserProfileModificationInput;
 import com.team.user.dto.output.FollowListOutput;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class UserService {
+    private final ApplicationEventPublisher publisher;
     private final UserRepository userRepository;
 
     @Transactional
