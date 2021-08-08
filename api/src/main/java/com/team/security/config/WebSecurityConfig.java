@@ -6,11 +6,11 @@ import com.team.security.OAuth2AuthenticationFailureHandler;
 import com.team.security.OAuth2AuthenticationSuccessHandler;
 import com.team.security.jwt.JwtAuthenticationEntryPoint;
 import com.team.security.jwt.TokenProvider;
-import com.team.user.UserService;
 import com.team.util.CookieUtil;
 import com.team.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,22 +20,18 @@ import org.springframework.security.config.annotation.web.configurers.RequestCac
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
+import org.springframework.security.oauth2.client.*;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.savedrequest.CookieRequestCache;
-import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 
 @EnableWebSecurity(debug = true)
@@ -47,8 +43,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final CookieUtil cookieUtil;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final ObjectMapper objectMapper;
-    private final OAuth2AuthorizedClientRepository clientRepository;
     private final com.team.user.OAuth2UserService userService;
+
 
 
     @Override
@@ -85,9 +81,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public OAuth2AuthenticationSuccessHandler successHandler() {
         return OAuth2AuthenticationSuccessHandler.builder()
-                .clientRepository(clientRepository)
                 .cookieUtil(cookieUtil)
-                .oAuth2UserService(oAuth2UserService())
                 .redisUtil(redisUtil)
                 .tokenProvider(tokenProvider)
                 .userService(userService)
@@ -112,27 +106,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService() {
-        return new DefaultOAuth2UserService();
-    }
-
-    @Bean
-    public OAuth2AuthorizedClientManager authorizedClientManager(
-            ClientRegistrationRepository clientRegistrationRepository,
-            OAuth2AuthorizedClientRepository authorizedClientRepository) {
-
-        OAuth2AuthorizedClientProvider authorizedClientProvider = OAuth2AuthorizedClientProviderBuilder.builder()
-                .authorizationCode()
-                .build();
-
-        DefaultOAuth2AuthorizedClientManager authorizedClientManager = new DefaultOAuth2AuthorizedClientManager(
-                clientRegistrationRepository,
-                authorizedClientRepository);
-        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
-
-        return authorizedClientManager;
     }
 }
