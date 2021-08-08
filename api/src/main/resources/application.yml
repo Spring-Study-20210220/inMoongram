@@ -27,7 +27,7 @@ spring:
         registration:
           facebook:
             client-id: [client-id]
-            client-secret: [client-sercret]
+            client-secret: [client-secret]
             authorization-grant-type: authorization_code
         provider:
           facebook:
