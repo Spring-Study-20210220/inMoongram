@@ -90,18 +90,7 @@ class PostAcceptanceTest {
                         .extract()
                         .as(SavePostResponse.class);
 
-        assertThat(response.getUserId()).isEqualTo(user1.getId());
         assertThat(response.getPostId()).isEqualTo(1L);
-        assertThat(response.getContent()).isEqualTo("test-content");
-        assertThat(response.getPostImages().size()).isEqualTo(2);
-        assertThat(response.getTaggedUserIds().size()).isEqualTo(2);
-        assertThat(response.getTaggedUserIds().get(0)).isEqualTo(user2.getId());
-        assertThat(response.getTaggedUserIds().get(1)).isEqualTo(user3.getId());
-        assertThat(response.getTaggedKeywords().size()).isEqualTo(1);
-        assertThat(response.getTaggedKeywords().get(0)).isEqualTo(keyword);
-
-        // 테스트로 인해 저장된 파일 삭제
-        deleteTestUploadImages(response);
     }
 
     @Test
@@ -115,12 +104,5 @@ class PostAcceptanceTest {
                 .delete("/post/{post-id}", post.getId())
         .then()
                 .statusCode(204);
-    }
-
-    private void deleteTestUploadImages(SavePostResponse response) {
-        response.getPostImages()
-                .stream()
-                .map(fileName -> new File(absolutePath + "/" + fileName))
-                .forEach(File::delete);
     }
 }

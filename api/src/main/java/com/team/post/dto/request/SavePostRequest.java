@@ -37,6 +37,7 @@ public class SavePostRequest {
         return SavePostInput.builder()
                 .userId(userId)
                 .content(content)
+                .postImages(postImages)
                 .taggedUserIds(taggedUserIds)
                 .taggedKeywords(taggedKeywords)
                 .build();

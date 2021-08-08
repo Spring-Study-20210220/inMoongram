@@ -1,12 +1,9 @@
 package com.team.post;
 
-import com.team.event.PostCreateEvent;
 import com.team.post.dto.output.SavePostOutput;
 import com.team.post.dto.request.SavePostRequest;
 import com.team.post.dto.response.SavePostResponse;
-import com.team.post.util.ImageUploader;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,15 +18,11 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 @RequestMapping("/post")
 @RequiredArgsConstructor
 public class PostController {
-    private final ApplicationEventPublisher publisher;
-    private final ImageUploader uploader;
     private final PostService postService;
 
     @PostMapping(value = "")
     public ResponseEntity<SavePostResponse> savePost(@Valid @ModelAttribute SavePostRequest request) {
         SavePostOutput output = postService.save(request.toInput());
-        publisher.publishEvent(new PostCreateEvent(output.getPostId(), request.getPostImages()));
-
         UriComponents uriComponents = MvcUriComponentsBuilder
                 .fromMethodCall(on(PostController.class).savePost(request))
                 .build();
