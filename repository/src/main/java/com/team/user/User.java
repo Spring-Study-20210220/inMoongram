@@ -45,6 +45,9 @@ public class User {
     @Column(name = "profile_image")
     private String profileImage;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Authority authority;
+
     // 사용자를 팔로우 하는 사람들
     @OneToMany(mappedBy = "followee")
     private Set<Follow> followers = new LinkedHashSet<>();
@@ -89,6 +92,10 @@ public class User {
         this.sex = sex;
         this.website = website;
         this.profileImage = profileImage;
+    }
+
+    public void modifyRole(UserRole role) {
+        this.authority.updateRole(role);
     }
 
     public void setIdForTest(Long id) {

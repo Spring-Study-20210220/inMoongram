@@ -33,11 +33,11 @@ public class SavePostRequest {
         this.taggedKeywords = taggedKeywords;
     }
 
-    public SavePostInput toInput(List<Long> postImageIds) {
+    public SavePostInput toInput() {
         return SavePostInput.builder()
                 .userId(userId)
                 .content(content)
-                .postImageIds(postImageIds)
+                .postImages(postImages)
                 .taggedUserIds(taggedUserIds)
                 .taggedKeywords(taggedKeywords)
                 .build();

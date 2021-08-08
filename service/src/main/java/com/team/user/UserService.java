@@ -1,5 +1,6 @@
 package com.team.user;
 
+import com.team.event.SignupEvent;
 import com.team.exception.IdNotFoundException;
 import com.team.user.dto.input.FollowerInfoListInput;
 import com.team.user.dto.input.SignupInput;
@@ -8,6 +9,7 @@ import com.team.user.dto.output.FollowListOutput;
 import com.team.user.dto.output.FollowerInfoListOutput;
 import com.team.user.dto.output.SignupOutput;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class UserService {
+    private final ApplicationEventPublisher publisher;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -41,6 +44,7 @@ public class UserService {
                         .build()
         );
 
+        publisher.publishEvent(new SignupEvent(saveUser.getEmail(), saveUser.getNickname()));
         return new SignupOutput(saveUser);
     }
 

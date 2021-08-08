@@ -31,9 +31,9 @@ public class PostService {
         Post post = new Post(input.getContent(), user);
         Post savePost = postRepository.save(post);
 
-        addImages(input, savePost);
         tagUsers(input, savePost);
         tagKeywords(input, savePost);
+        uploadImages(input, savePost);
         return new SavePostOutput(savePost);
     }
 
@@ -49,9 +49,9 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    private void addImages(SavePostInput input, Post post) {
-        List<PostImage> findImages = postImageService.findImagesByIds(input.getPostImageIds());
-        post.addImages(findImages);
+    public Post findPostById(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(IdNotFoundException::new);
     }
 
     private void tagUsers(SavePostInput input, Post post) {
@@ -62,16 +62,16 @@ public class PostService {
         }
     }
 
-    public Post findPostById(Long postId) {
-        return postRepository.findById(postId)
-                .orElseThrow(IdNotFoundException::new);
-    }
-
     private void tagKeywords(SavePostInput input, Post post) {
         List<PostTaggedKeyword> postTaggedKeywords = postTaggedKeywordService.tagAll(input.getTaggedKeywords(), post);
         if (postTaggedKeywords != null) {
             post.addTaggedKeywords(postTaggedKeywords);
         }
+    }
+
+    private void uploadImages(SavePostInput input, Post post) {
+        List<PostImage> postImages = postImageService.storeImages(input.getPostImages());
+        post.addImages(postImages);
     }
 
     private List<User> getTaggedUsers(List<Long> userIds) {
