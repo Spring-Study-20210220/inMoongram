@@ -1,7 +1,6 @@
 package com.team.post.dto.input;
 
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -12,7 +11,6 @@ public class FeedInput {
     private Long userId;
     private int page;
 
-    @Builder
     public FeedInput(Long userId, int page) {
         this.userId = userId;
         this.page = page;

@@ -1,15 +1,17 @@
 package com.team.user;
 
-import com.team.QueryConfig;
+import com.team.authUtil.TestAuthProvider;
 import com.team.dbutil.DatabaseCleanup;
 import com.team.dbutil.FollowData;
 import com.team.dbutil.UserData;
 import com.team.post.dto.response.FeedResponse;
+import com.team.post.dto.response.SavePostResponse;
 import com.team.user.dto.output.FollowListOutput;
 import com.team.user.dto.request.UserProfileModificationRequest;
 import com.team.user.dto.response.FollowerInfoListResponse;
 import com.team.user.dto.response.FollowerInfoResponse;
 import io.restassured.http.ContentType;
+import io.restassured.http.Cookie;
 import io.restassured.response.Response;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -19,16 +21,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.StopWatch;
 
-import java.util.*;
 import java.io.File;
+import java.util.*;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles(value = {"dev"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserAcceptanceTest {
 
@@ -43,6 +46,9 @@ class UserAcceptanceTest {
 
     @Autowired
     private FollowData followData;
+
+    @Autowired
+    private TestAuthProvider testAuthProvider;
 
     @AfterEach
     void tearDown() {
@@ -60,7 +66,9 @@ class UserAcceptanceTest {
         Follow follow2 = followData.saveFollow(user3, user1);
         Follow follow3 = followData.saveFollow(user4, user1);
 
-        List<FollowerInfoResponse> actual = getFollowerTest(user1.getId());
+        Cookie cookie = testAuthProvider.getAccessTokenCookie(user1);
+
+        List<FollowerInfoResponse> actual = getFollowerTest(cookie);
         actual.sort(Comparator.comparingLong(FollowerInfoResponse::getUserId));
         List<User> expected = Arrays.asList(user2, user3, user4);
         Assertions.assertThat(actual.size()).isEqualTo(expected.size());
@@ -77,16 +85,17 @@ class UserAcceptanceTest {
         User user = userData.saveUser("승화", "a", "a@naver.com");
         int max = 10000;
         List<User> users = new ArrayList<>();
-        for(int i = 0; i < max; i++) {
-            users.add(userData.saveUser("승화"+i, "a"+i, "a"+i+"@naver.com"));
+        for (int i = 0; i < max; i++) {
+            users.add(userData.saveUser("승화" + i, "a" + i, "a" + i + "@naver.com"));
         }
         List<Follow> follows = new ArrayList<>();
-        for(int i = 0; i < max; i++) {
+        for (int i = 0; i < max; i++) {
             follows.add(followData.saveFollow(users.get(i), user));
         }
+        Cookie cookie = testAuthProvider.getAccessTokenCookie(user);
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        List<FollowerInfoResponse> actual = getFollowerTest(user.getId());
+        List<FollowerInfoResponse> actual = getFollowerTest(cookie);
         stopWatch.stop();
         System.out.println(stopWatch.prettyPrint());
         actual.sort(Comparator.comparingLong(FollowerInfoResponse::getUserId));
@@ -107,28 +116,29 @@ class UserAcceptanceTest {
         Follow follow1 = followData.saveFollow(user2, user1);
         Follow follow2 = followData.saveFollow(user3, user1);
         Follow follow3 = followData.saveFollow(user1, user2);
-
-        List<FollowerInfoResponse> actual = getFollowerTest(user1.getId());
+        Cookie cookie = testAuthProvider.getAccessTokenCookie(user1);
+        List<FollowerInfoResponse> actual = getFollowerTest(cookie);
         actual.sort(Comparator.comparingLong(FollowerInfoResponse::getUserId));
         List<User> expected = Arrays.asList(user2);
         Assertions.assertThat(actual.size()).isEqualTo(2);
         for (FollowerInfoResponse followerInfoResponse : actual) {
-            if(followerInfoResponse.getUserId().equals(user2.getId())) {
+            if (followerInfoResponse.getUserId().equals(user2.getId())) {
                 Assertions.assertThat(followerInfoResponse.isFollowBack()).isTrue();
             }
-            if(followerInfoResponse.getUserId().equals(user3.getId())) {
+            if (followerInfoResponse.getUserId().equals(user3.getId())) {
                 Assertions.assertThat(followerInfoResponse.isFollowBack()).isFalse();
             }
         }
     }
 
-    List<FollowerInfoResponse> getFollowerTest(Long id) {
+    List<FollowerInfoResponse> getFollowerTest(Cookie cookie) {
         Response response =
                 given()
+                        .cookie(cookie)
                         .port(port)
-                .when()
-                        .get("user/{id}/followers", id)
-                .thenReturn();
+                        .when()
+                        .get("user/followers")
+                        .thenReturn();
 
         Assertions.assertThat(response.getStatusCode()).isEqualTo(200);
         return response.getBody()
@@ -138,8 +148,7 @@ class UserAcceptanceTest {
 
     @Test
     void 유저정보변경_정상() {
-        User testUser = userData.saveUser("정준수", "test1", "jungjunsu@naver.com");
-        Long testUserId = testUser.getId();
+        Cookie cookie = testAuthProvider.getAccessTokenCookie("test@test.com", "testUser", "myNick");
 
         var reqDto = UserProfileModificationRequest.builder()
                 .email("test@test.com")
@@ -151,21 +160,21 @@ class UserAcceptanceTest {
                 .profileImage("image")
                 .sex(Sex.MALE)
                 .build();
-        assertThat(testUserId).isEqualTo(1L);
+
         given().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
+                cookie(cookie).
                 port(port).
                 body(reqDto).
-        when().
-                patch("/user/{user_id}/profile", testUserId).
-        then().
+                when().
+                patch("/user/profile").
+                then().
                 statusCode(204);
     }
 
     @Test
     void 유저정보변경_잘못된요청데이터() {
-        User testUser = userData.saveUser("정준수", "test1", "jungjunsu@naver.com");
-        Long testUserId = testUser.getId();
+        Cookie cookie = testAuthProvider.getAccessTokenCookie("test@test.com", "testUser", "myNick");
 
         var reqDto = UserProfileModificationRequest.builder()
                 .name("testuser")
@@ -176,14 +185,15 @@ class UserAcceptanceTest {
                 .profileImage("image")
                 .sex(Sex.MALE)
                 .build();
-        assertThat(testUserId).isEqualTo(1L);
+
         given().
                 contentType(MediaType.APPLICATION_JSON_VALUE).
+                cookie(cookie).
                 port(port).
                 body(reqDto).
-        when().
-                patch("/user/{user_id}/profile", testUserId).
-        then().
+                when().
+                patch("/user/profile").
+                then().
                 statusCode(400);
     }
 
@@ -195,14 +205,17 @@ class UserAcceptanceTest {
         Follow follow1 = followData.saveFollow(user1, user2);
         Follow follow2 = followData.saveFollow(user1, user3);
 
+        Cookie cookie = testAuthProvider.getAccessTokenCookie(user1);
+
         FollowListOutput response =
                 given()
                         .port(port)
+                        .cookie(cookie)
                         .accept("application/json")
                         .contentType("application/json")
-                .when()
-                        .get("user/{user-id}/followings",user1.getId())
-                .then()
+                        .when()
+                        .get("user/followings")
+                        .then()
                         .statusCode(200)
                         .extract()
                         .as(FollowListOutput.class);
@@ -229,6 +242,8 @@ class UserAcceptanceTest {
         Follow follow1 = followData.saveFollow(user1, user2);
         Follow follow2 = followData.saveFollow(user1, user3);
 
+        Cookie cookie = testAuthProvider.getAccessTokenCookie(user1);
+
         savePost(user2, "first");
         savePost(user3, "second");
         savePost(user4, "third");
@@ -237,10 +252,11 @@ class UserAcceptanceTest {
         FeedResponse response =
                 given()
                         .port(port)
+                        .cookie(cookie)
                         .accept("application/json")
                         .param("page-no", 1)
                         .when()
-                        .get("/user/{user-id}/feed", user1.getId())
+                        .get("/user/feed")
                         .then()
                         .statusCode(200)
                         .extract()
@@ -255,14 +271,21 @@ class UserAcceptanceTest {
     private void savePost(User user, String content) {
         String path = "src/test/resources/images";
         String absolutePath = new File(path).getAbsolutePath();
-        given()
-                .port(port)
-                .accept(ContentType.JSON)
-                .multiPart("userId", user.getId())
-                .multiPart("content", content)
-                .multiPart("postImages", new File(absolutePath+"/apple.jpeg"))
-        .when()
-                .post("/post")
-        .then();
+        Cookie cookie = testAuthProvider.getAccessTokenCookie(user);
+        SavePostResponse response =
+                given()
+                        .port(port)
+                        .cookie(cookie)
+                        .accept(ContentType.JSON)
+                        .multiPart("content", content)
+                        .multiPart("taggedUserIds", 2L)
+                        .multiPart("taggedUserIds", 3L)
+                        .multiPart("taggedUserIds", 4L)
+                        .multiPart("postImages", new File(absolutePath + "/apple.jpeg"))
+                        .when()
+                        .post("/post")
+                        .then()
+                        .extract()
+                        .as(SavePostResponse.class);
     }
 }

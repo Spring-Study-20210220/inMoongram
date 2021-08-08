@@ -2,7 +2,6 @@ package com.team.user;
 
 import com.team.user.dto.input.FollowInfoInput;
 import com.team.user.dto.output.FollowInfoOutput;
-import com.team.user.dto.output.FollowListOutput;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -98,9 +97,9 @@ class FollowServiceTest {
                 .willReturn(user1)
                 .willReturn(user2);
 
-        FollowInfoOutput result = followService.follow(new FollowInfoInput(1L, 2L));
+        FollowInfoOutput result = followService.follow(user1.getId(), new FollowInfoInput(user2.getId()));
 
-        assertThat(result.getFolloweeId()).isEqualTo(2L);
-        assertThat(result.getFollowerId()).isEqualTo(1L);
+        assertThat(result.getFolloweeId()).isEqualTo(user2.getId());
+        assertThat(result.getFollowerId()).isEqualTo(user1.getId());
     }
 }

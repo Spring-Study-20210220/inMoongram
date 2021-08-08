@@ -10,12 +10,9 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostScrapSaveRequest {
     @NotNull
-    private Long userId;
-    @NotNull
     private Long postId;
 
-    public PostScrapSaveRequest(Long userId, Long postId) {
-        this.userId = userId;
+    public PostScrapSaveRequest(Long postId) {
         this.postId = postId;
     }
 }

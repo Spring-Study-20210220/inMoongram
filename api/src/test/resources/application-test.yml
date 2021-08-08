@@ -4,6 +4,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
-file:
-  dir: src/test/resources/images
+  config:
+    activate:
+      on-profile: test

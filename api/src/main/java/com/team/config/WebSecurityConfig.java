@@ -1,5 +1,6 @@
-package com.team.security.config;
+package com.team.config;
 
+import com.team.security.jwt.JwtAccessDeniedHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team.security.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.team.security.OAuth2AuthenticationFailureHandler;
@@ -34,7 +35,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.savedrequest.CookieRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -42,6 +43,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final RedisUtil redisUtil;
     private final CookieUtil cookieUtil;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final ObjectMapper objectMapper;
     private final com.team.user.OAuth2UserService userService;
 
@@ -57,6 +59,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler)
                 )
                 .sessionManagement(management -> management
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

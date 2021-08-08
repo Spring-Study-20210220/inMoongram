@@ -11,16 +11,13 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FollowRequest {
     @NotNull
-    private Long followerId;
-    @NotNull
     private Long followeeId;
 
-    public FollowRequest(Long followerId, Long followeeId) {
-        this.followerId = followerId;
+    public FollowRequest(Long followeeId) {
         this.followeeId = followeeId;
     }
 
     public FollowInfoInput toInput() {
-        return new FollowInfoInput(followerId, followeeId);
+        return new FollowInfoInput(followeeId);
     }
 }

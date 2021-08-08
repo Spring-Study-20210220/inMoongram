@@ -3,6 +3,7 @@ package com.team.comment;
 import com.team.comment.dto.request.CommentSaveRequest;
 import com.team.comment.dto.response.CommentInfoResponse;
 import com.team.comment.dto.response.CommentSaveResponse;
+import com.team.security.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +18,12 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/comment")
-    public ResponseEntity<CommentSaveResponse> saveComment(@RequestBody CommentSaveRequest request) {
-        var output = commentService.saveComment(request.toServiceDto());
+    public ResponseEntity<CommentSaveResponse> saveComment(@CurrentUser Long userId,
+                                                           @RequestBody CommentSaveRequest request) {
+        var output = commentService.saveComment(userId, request.toServiceDto());
         UriComponents uriComponents = MvcUriComponentsBuilder
                 .fromMethodCall(on(CommentController.class)
-                        .saveComment(request))
+                        .saveComment(userId, request))
                 .build();
         return ResponseEntity
                 .created(uriComponents.toUri())
@@ -37,7 +39,7 @@ public class CommentController {
     }
 
     @GetMapping("/comments")
-    public ResponseEntity<CommentInfoResponse> getComments(@RequestParam("postId") Long postId){
+    public ResponseEntity<CommentInfoResponse> getComments(@RequestParam("postId") Long postId) {
         var output = commentService.getComments(postId);
         return ResponseEntity
                 .ok(new CommentInfoResponse(output));

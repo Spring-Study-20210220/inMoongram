@@ -108,7 +108,6 @@ class CommentServiceTest {
     void 댓글_작성() {
         CommentSaveInput input = CommentSaveInput.builder()
                 .postId(post.getId())
-                .writerId(postAuthor.getId())
                 .content("testContent")
                 .commentTaggedKeywords(Lists.list("아이유", "헤이즈"))
                 .commentTaggedUserIds(Lists.list(3L))
@@ -123,7 +122,7 @@ class CommentServiceTest {
         given(commentTaggedKeywordService.tagAllKeywords(any(), any()))
                 .willReturn(List.of(commentTaggedKeyword1, commentTaggedKeyword2));
 
-        var output = commentService.saveComment(input);
+        var output = commentService.saveComment(postAuthor.getId(), input);
 
         assertThat(output.getCommentId()).isEqualTo(5L);
     }
@@ -146,6 +145,6 @@ class CommentServiceTest {
                 .contains("아이유", "헤이즈");
         assertThat(output.get(0).getTaggedUsers())
                 .extracting("taggedUserId")
-                .contains(3L,4L);
+                .contains(3L, 4L);
     }
 }

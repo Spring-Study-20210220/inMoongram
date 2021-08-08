@@ -11,7 +11,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommentSaveRequest {
-    private Long writerId;
     private Long postId;
     private Long superCommentId;
     private String content;
@@ -21,7 +20,6 @@ public class CommentSaveRequest {
     @Builder
     public CommentSaveRequest(Long writerId, Long postId, Long superCommentId, String content,
                               List<String> commentTaggedKeywords, List<Long> commentTaggedUserIds) {
-        this.writerId = writerId;
         this.postId = postId;
         this.superCommentId = superCommentId;
         this.content = content;
@@ -29,9 +27,8 @@ public class CommentSaveRequest {
         this.commentTaggedUserIds = commentTaggedUserIds;
     }
 
-    public CommentSaveInput toServiceDto(){
+    public CommentSaveInput toServiceDto() {
         return CommentSaveInput.builder()
-                .writerId(writerId)
                 .postId(postId)
                 .content(content)
                 .superCommentId(superCommentId)

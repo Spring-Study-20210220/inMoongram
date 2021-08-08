@@ -1,6 +1,5 @@
 package com.team.comment.dto.request;
 
-import com.team.comment.Comment;
 import com.team.comment.dto.input.CommentLikePlusInput;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -12,16 +11,13 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommentLikePlusRequest {
     @NotNull
-    private Long userId;
-    @NotNull
     private Long commentId;
 
-    public CommentLikePlusRequest(Long userId, Long commentId) {
-        this.userId = userId;
+    public CommentLikePlusRequest(Long commentId) {
         this.commentId = commentId;
     }
 
     public CommentLikePlusInput toInput() {
-        return new CommentLikePlusInput(userId, commentId);
+        return new CommentLikePlusInput(commentId);
     }
 }

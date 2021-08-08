@@ -15,10 +15,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public class CommentLikeServiceTest {
+class CommentLikeServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -43,7 +44,7 @@ public class CommentLikeServiceTest {
                 .nickname("peach")
                 .build();
         user1.setIdForTest(1L);
-        post1 = new Post("hello" ,user1);
+        post1 = new Post("hello", user1);
         post1.setIdForTest(1L);
         comment1 = Comment.builder()
                 .content("안녕하세요")
@@ -69,7 +70,7 @@ public class CommentLikeServiceTest {
         given(commentRepository.findById(1L)).willReturn(Optional.of(comment1));
         given(commentLikeRepository.save(any())).willReturn(commentLike1);
 
-        CommentLikePlusOutput output = commentLikeService.like(new CommentLikePlusInput(user1.getId(), comment1.getId()));
+        CommentLikePlusOutput output = commentLikeService.like(user1.getId(), new CommentLikePlusInput(comment1.getId()));
 
         Assertions.assertThat(output.getCommentLikeId()).isEqualTo(commentLike1.getId());
     }

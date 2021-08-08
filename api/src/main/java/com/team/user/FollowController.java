@@ -1,5 +1,6 @@
 package com.team.user;
 
+import com.team.security.CurrentUser;
 import com.team.user.dto.output.FollowInfoOutput;
 import com.team.user.dto.request.FollowRequest;
 import com.team.user.dto.response.FollowInfoResponse;
@@ -28,12 +29,13 @@ public class FollowController {
     }
 
     @PostMapping("")
-    public ResponseEntity<FollowInfoResponse> follow(@Valid @RequestBody FollowRequest request) {
-        FollowInfoOutput output = followService.follow(request.toInput());
+    public ResponseEntity<FollowInfoResponse> follow(@CurrentUser Long userId,
+                                                     @Valid @RequestBody FollowRequest request) {
+        FollowInfoOutput output = followService.follow(userId, request.toInput());
 
         UriComponents uriComponents = MvcUriComponentsBuilder
                 .fromMethodCall(on(FollowController.class)
-                .follow(request))
+                        .follow(userId, request))
                 .build();
         return ResponseEntity
                 .created(uriComponents.toUri())

@@ -26,8 +26,8 @@ public class CommentService {
     private final CommentTaggedUserService commentTaggedUserService;
 
     @Transactional
-    public CommentSaveOutput saveComment(CommentSaveInput input) {
-        User user = userService.findUserById(input.getWriterId());
+    public CommentSaveOutput saveComment(Long userId, CommentSaveInput input) {
+        User user = userService.findUserById(userId);
         Post post = postService.findPostById(input.getPostId());
         Comment superComment = getSuperComment(input);
         Comment comment = Comment.builder()
@@ -37,25 +37,25 @@ public class CommentService {
                 .superComment(superComment)
                 .build();
         Comment savedComment = commentRepository.save(comment);
-        if(input.getCommentTaggedKeywords() != null)
+        if (input.getCommentTaggedKeywords() != null)
             tagKeywords(savedComment, input);
-        if(input.getCommentTaggedUserIds() != null)
+        if (input.getCommentTaggedUserIds() != null)
             tagUsers(savedComment, input);
         return new CommentSaveOutput(savedComment);
     }
 
     @Transactional
-    public void deleteComment(Long commentId){
+    public void deleteComment(Long commentId) {
         Comment comment = findCommentById(commentId);
         commentRepository.delete(comment);
     }
 
     @Transactional
-    public List<CommentInfoOutput> getComments(Long postId){
+    public List<CommentInfoOutput> getComments(Long postId) {
         Post post = postService.findPostById(postId);
         Set<Comment> comments = post.getComments();
         return comments.stream()
-                .filter(it->it.getSuperComment()==null)
+                .filter(it -> it.getSuperComment() == null)
                 .map(CommentInfoOutput::new)
                 .collect(Collectors.toList());
     }

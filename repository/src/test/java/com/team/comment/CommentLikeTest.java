@@ -1,5 +1,6 @@
 package com.team.comment;
 
+import com.team.config.TestConfig;
 import com.team.post.Post;
 import com.team.post.PostRepository;
 import com.team.user.User;
@@ -9,8 +10,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
 @DataJpaTest
+@Import(TestConfig.class)
 public class CommentLikeTest {
 
     @Autowired
@@ -26,6 +29,7 @@ public class CommentLikeTest {
     private Post post;
     private Comment comment;
     private CommentLike commentLike;
+
     @BeforeEach
     void setUp() {
         user = userRepository.save(User.builder()

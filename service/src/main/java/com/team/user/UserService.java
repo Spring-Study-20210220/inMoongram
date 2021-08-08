@@ -1,7 +1,9 @@
 package com.team.user;
 
+import com.team.event.SignupEvent;
 import com.team.exception.IdNotFoundException;
 import com.team.user.dto.input.*;
+import com.team.user.dto.input.UserProfileModificationInput;
 import com.team.user.dto.output.FollowListOutput;
 import com.team.user.dto.output.FollowerInfoListOutput;
 import com.team.user.dto.output.SignupOutput;
@@ -60,10 +62,10 @@ public class UserService {
     }
 
     @Transactional
-    public FollowerInfoListOutput getFollowerList(FollowerInfoListInput command) {
-        List<Follower> followers = userRepository.findFollowerUserById(command.getUserId());
+    public FollowerInfoListOutput getFollowerList(Long userId) {
+        List<Follower> followers = userRepository.findFollowerUserById(userId);
 
-        return new FollowerInfoListOutput(followers, command.getUserId());
+        return new FollowerInfoListOutput(followers, userId);
     }
 
     @Transactional(readOnly = true)
@@ -94,7 +96,7 @@ public class UserService {
     }
 
     @Transactional
-    public List<User> findUsersByIds(List<Long> userIds){
+    public List<User> findUsersByIds(List<Long> userIds) {
         return userIds.stream()
                 .map(this::findUserById)
                 .collect(Collectors.toList());

@@ -8,19 +8,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
@@ -50,16 +45,16 @@ public class Comment {
     private Comment superComment;
 
     @OneToMany(mappedBy = "superComment", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<Comment> subComments = new ArrayList<>();
+    private final List<Comment> subComments = new ArrayList<>();
 
     @OneToMany(mappedBy = "comment", orphanRemoval = true, cascade = CascadeType.ALL)
-    private Set<CommentTaggedKeyword> commentTaggedKeywords = new LinkedHashSet<>();
+    private final Set<CommentTaggedKeyword> commentTaggedKeywords = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "comment", orphanRemoval = true, cascade = CascadeType.ALL)
-    private Set<CommentTaggedUser> commentTaggedUsers = new LinkedHashSet<>();
-  
+    private final Set<CommentTaggedUser> commentTaggedUsers = new LinkedHashSet<>();
+
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
-    private Set<CommentLike> commentLikes = new LinkedHashSet<>();
+    private final Set<CommentLike> commentLikes = new LinkedHashSet<>();
 
     @Builder
     public Comment(Long id, String content, User user, Post post, Comment superComment) {

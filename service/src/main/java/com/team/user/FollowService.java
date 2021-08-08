@@ -25,8 +25,8 @@ public class FollowService {
         followRepository.deleteById(follow.getId());
     }
 
-    public FollowInfoOutput follow(FollowInfoInput followInfo) {
-        User follower = userService.findUserById(followInfo.getFollowerId());
+    public FollowInfoOutput follow(Long followerId, FollowInfoInput followInfo) {
+        User follower = userService.findUserById(followerId);
         User followee = userService.findUserById(followInfo.getFolloweeId());
         Follow follow = followRepository.save(Follow.builder()
                 .follower(follower)

@@ -1,38 +1,41 @@
 package com.team.security.jwt;
 
+import com.team.auth.CustomUserDetailsService;
+import com.team.config.AppProperties;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.Date;
 
 @Slf4j
 @Component
-public class TokenProvider implements InitializingBean {
+@RequiredArgsConstructor
+public class TokenProvider {
     public static final long ACCESS_TOKEN_VALID_TIME = 1 * 60 * 30 * 1000L; // 30 minutes
     public static final long REFRESH_TOKEN_VALID_TIME = 1 * 60 * 60 * 24 * 14 * 1000L; // 2 weeks
+    private final CustomUserDetailsService customUserDetailsService;
+    private final AppProperties properties;
 
-    private final String secret;
     private Key key;
 
-    public TokenProvider(@Value("${jwt.secret}") String secret) {
-        this.secret = secret;
+    public String getSecret() {
+        return properties.getAuth().getSecret();
     }
 
-    @Override
+    @PostConstruct
     public void afterPropertiesSet() throws Exception {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        byte[] keyBytes = Decoders.BASE64.decode(getSecret());
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -54,7 +57,7 @@ public class TokenProvider implements InitializingBean {
 
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaimsJws(token).getBody();
-        User principle = new User(claims.getSubject(), "", new ArrayList<>());
+        UserDetails principle = customUserDetailsService.loadUserByUsername(claims.getSubject());
         return new UsernamePasswordAuthenticationToken(principle, token, new ArrayList<>());
     }
 

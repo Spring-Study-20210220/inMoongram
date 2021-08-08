@@ -2,6 +2,7 @@ package com.team.post;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.team.user.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 
@@ -17,13 +18,12 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
     @Override
     public List<Post> getFeed(Long userId, Pageable pageable) {
-        return jpaQueryFactory.select(post)
-                .from(post, user, follow)
-                .where(
-                        userIdEq(userId),
-                        follow.followee.eq(post.user),
-                        follow.follower.eq(user)
-                )
+        QUser postAuthor = new QUser("author");
+        return jpaQueryFactory.selectFrom(post)
+                .join(post.user, postAuthor).fetchJoin()
+                .join(follow).on(postAuthor.eq(follow.followee)).fetchJoin()
+                .join(user).on(follow.follower.eq(user)).fetchJoin()
+                .where(userIdEq(userId))
                 .orderBy(post.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -31,7 +31,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     private BooleanExpression userIdEq(Long userId) {
-        if(userId == null || userId < 0) {
+        if (userId == null || userId < 0) {
             return null;
         }
         return user.id.eq(userId);

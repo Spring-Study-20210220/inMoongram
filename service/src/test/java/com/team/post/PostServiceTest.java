@@ -82,7 +82,7 @@ class PostServiceTest {
     @Test
     void 게시글_저장() {
         PostImage postImage1 = new PostImage("image1.jpg", "11111111-1111-1111-1111-111111111111.jpg", "src/images/11111111-1111-1111-1111-111111111111.jpg");
-        PostImage postImage2 = new PostImage("image2.jpg", "22222222-2222-2222-2222-222222222222.jpg", "src/images/22222222-2222-2222-2222-222222222222.jpg");;
+        PostImage postImage2 = new PostImage("image2.jpg", "22222222-2222-2222-2222-222222222222.jpg", "src/images/22222222-2222-2222-2222-222222222222.jpg");
         List<PostImage> postImages = Arrays.asList(postImage1, postImage2);
 
         PostTaggedUser userTag1 = new PostTaggedUser(user2, post);
@@ -94,31 +94,20 @@ class PostServiceTest {
         List<PostTaggedKeyword> keywordTags = Arrays.asList(keywordTag1, keywordTag2);
 
         given(userService.findUserById(any())).willReturn(user1).willReturn(user2).willReturn(user3);
-        given(postImageService.findImagesByIds(any())).willReturn(postImages);
+        given(postImageService.storeImages(any())).willReturn(postImages);
         given(postRepository.save(any())).willReturn(post);
         given(postTaggedUserService.tagAll(any(), any())).willReturn(userTags);
         given(postTaggedKeywordService.tagAll(any(), any())).willReturn(keywordTags);
 
         SavePostInput input = SavePostInput.builder()
-                .userId(user1.getId())
                 .content("test-content")
-                .postImageIds(postImages.stream().map(PostImage::getId).collect(Collectors.toList()))
                 .taggedUserIds(Arrays.asList(user2.getId(), user3.getId()))
                 .taggedKeywords(Arrays.asList("inMoongram", "spring"))
                 .build();
 
-        SavePostOutput output = postService.save(input);
+        SavePostOutput output = postService.save(user1.getId(), input);
 
-        assertThat(output.getContent()).isEqualTo(input.getContent());
-        assertThat(output.getPostImages().size()).isEqualTo(2);
-        assertThat(output.getPostImages().get(0)).isEqualTo(postImage1.getUploadFileName());
-        assertThat(output.getPostImages().get(1)).isEqualTo(postImage2.getUploadFileName());
-        assertThat(output.getTaggedUserIds().size()).isEqualTo(2);
-        assertThat(output.getTaggedUserIds().get(0)).isEqualTo(user2.getId());
-        assertThat(output.getTaggedUserIds().get(1)).isEqualTo(user3.getId());
-        assertThat(output.getTaggedKeywords().size()).isEqualTo(2);
-        assertThat(output.getTaggedKeywords().get(0)).isEqualTo(keywordTag1.getTagKeyword().getKeyword());
-        assertThat(output.getTaggedKeywords().get(1)).isEqualTo(keywordTag2.getTagKeyword().getKeyword());
+        assertThat(output.getPostId()).isEqualTo(post.getId());
     }
 
     @Test
