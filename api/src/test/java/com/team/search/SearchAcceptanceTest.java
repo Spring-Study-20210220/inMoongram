@@ -1,5 +1,6 @@
 package com.team.search;
 
+import com.team.authUtil.TestAuthProvider;
 import com.team.dbutil.DatabaseCleanup;
 import com.team.dbutil.PostData;
 import com.team.dbutil.UserData;
@@ -7,6 +8,7 @@ import com.team.post.dto.request.SavePostRequest;
 import com.team.search.dto.response.SearchResponse;
 import com.team.user.User;
 import io.restassured.http.ContentType;
+import io.restassured.http.Cookie;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -26,6 +29,7 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles(value = {"dev"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class SearchAcceptanceTest {
     @LocalServerPort
@@ -33,6 +37,9 @@ class SearchAcceptanceTest {
 
     @Autowired
     private DatabaseCleanup dbCleanup;
+
+    @Autowired
+    private TestAuthProvider testAuthProvider;
 
     @Autowired
     private PostData postData;
@@ -54,26 +61,27 @@ class SearchAcceptanceTest {
         user2 = userData.saveUser("yongwoo", "springExpert", "test2@test.com");
         user3 = userData.saveUser("seounghwa", "SpringMasterUser", "test3@test.com");
 
-        createPost(List.of("아이유", "짭이유", "헤이즈"));
-        createPost(List.of("아이유", "spring", "ed sherran"));
+        createPost(user2, List.of("아이유", "짭이유", "헤이즈"));
+        createPost(user3, List.of("아이유", "spring", "ed sherran"));
     }
 
-    public void createPost(List<String> keywordList) throws IOException {
+    public void createPost(User user, List<String> keywordList) throws IOException {
         String path = "src/test/resources/images";
         String absolutePath = new File(path).getAbsolutePath();
         MultipartFile postImage1 = new MockMultipartFile("apple.jpeg", new FileInputStream(absolutePath + "/apple.jpeg"));
         MultipartFile postImage2 = new MockMultipartFile("grape.jpeg", new FileInputStream(absolutePath + "/grape.jpeg"));
         SavePostRequest request = SavePostRequest.builder()
                 .postImages(Arrays.asList(postImage1, postImage2))
-                .userId(user1.getId())
                 .content("test-content")
                 .taggedKeywords(keywordList)
                 .build();
 
+        Cookie cookie = testAuthProvider.getAccessTokenCookie(user);
+
         given()
                 .port(port)
+                .cookie(cookie)
                 .accept(ContentType.JSON)
-                .multiPart("userId", request.getUserId())
                 .multiPart("content", request.getContent())
                 .multiPart("taggedKeywords", request.getTaggedKeywords())
                 .multiPart("postImages", new File(absolutePath + "/apple.jpeg"))
@@ -87,7 +95,9 @@ class SearchAcceptanceTest {
     @Test
     void 검색() {
         String keyword = "spring";
+        Cookie cookie = testAuthProvider.getAccessTokenCookie(user1);
         var response = given()
+                .cookie(cookie)
                 .param("keyword", keyword)
                 .port(port)
                 .accept(MediaType.APPLICATION_JSON_VALUE)

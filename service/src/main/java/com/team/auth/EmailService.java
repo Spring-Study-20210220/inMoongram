@@ -1,4 +1,4 @@
-package com.team.user;
+package com.team.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;

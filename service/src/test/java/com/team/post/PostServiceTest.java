@@ -82,7 +82,7 @@ class PostServiceTest {
     @Test
     void 게시글_저장() {
         PostImage postImage1 = new PostImage("image1.jpg", "11111111-1111-1111-1111-111111111111.jpg", "src/images/11111111-1111-1111-1111-111111111111.jpg");
-        PostImage postImage2 = new PostImage("image2.jpg", "22222222-2222-2222-2222-222222222222.jpg", "src/images/22222222-2222-2222-2222-222222222222.jpg");;
+        PostImage postImage2 = new PostImage("image2.jpg", "22222222-2222-2222-2222-222222222222.jpg", "src/images/22222222-2222-2222-2222-222222222222.jpg");
         List<PostImage> postImages = Arrays.asList(postImage1, postImage2);
 
         PostTaggedUser userTag1 = new PostTaggedUser(user2, post);
@@ -100,13 +100,12 @@ class PostServiceTest {
         given(postTaggedKeywordService.tagAll(any(), any())).willReturn(keywordTags);
 
         SavePostInput input = SavePostInput.builder()
-                .userId(user1.getId())
                 .content("test-content")
                 .taggedUserIds(Arrays.asList(user2.getId(), user3.getId()))
                 .taggedKeywords(Arrays.asList("inMoongram", "spring"))
                 .build();
 
-        SavePostOutput output = postService.save(input);
+        SavePostOutput output = postService.save(user1.getId(), input);
 
         assertThat(output.getPostId()).isEqualTo(post.getId());
     }

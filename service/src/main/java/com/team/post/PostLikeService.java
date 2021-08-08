@@ -19,9 +19,9 @@ public class PostLikeService {
     private final PostLikeRepository postLikeRepository;
     private final UserService userService;
 
-    public PostLikeCreateOutput createLike(PostLikeCreateInput inputDto) {
-        User author = userService.findUserById(inputDto.getUserId());
-        Post post = postRepository.findById(inputDto.getPostId())
+    public PostLikeCreateOutput createLike(PostLikeCreateInput input) {
+        User author = userService.findUserById(input.getUserId());
+        Post post = postRepository.findById(input.getPostId())
                 .orElseThrow(() -> new IdNotFoundException("존재하지 않는 게시물입니다."));
         PostLike savedPostLike = postLikeRepository.save(
                 PostLike.builder()
@@ -43,7 +43,7 @@ public class PostLikeService {
                 .orElseThrow(() -> new IdNotFoundException("존재하지 않는 게시물입니다."));
         return new PostLikeInfoOutput(
                 post.getPostLikes().stream()
-                        .map(it-> PostLikeInfoOutput.PostLikeInfo.builder()
+                        .map(it -> PostLikeInfoOutput.PostLikeInfo.builder()
                                 .postId(it.getPost().getId())
                                 .userId(it.getUser().getId())
                                 .postLikeId(it.getId())

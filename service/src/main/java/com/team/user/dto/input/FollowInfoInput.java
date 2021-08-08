@@ -7,11 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FollowInfoInput {
-    private Long followerId;
     private Long followeeId;
 
-    public FollowInfoInput(Long followerId, Long followeeId) {
-        this.followerId = followerId;
+    public FollowInfoInput(Long followeeId) {
         this.followeeId = followeeId;
     }
 }

@@ -19,10 +19,10 @@ public class CommentLikeService {
     private final UserRepository userRepository;
 
     @Transactional
-    public CommentLikePlusOutput like(CommentLikePlusInput input) {
+    public CommentLikePlusOutput like(Long userId, CommentLikePlusInput input) {
         Comment comment = commentRepository.findById(input.getCommentId())
                 .orElseThrow(IdNotFoundException::new);
-        User user = userRepository.findById(input.getUserId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(IdNotFoundException::new);
         CommentLike saved = commentLikeRepository.save(new CommentLike(comment, user));
         return new CommentLikePlusOutput(saved.getId());

@@ -70,7 +70,7 @@ class CommentLikeServiceTest {
         given(commentRepository.findById(1L)).willReturn(Optional.of(comment1));
         given(commentLikeRepository.save(any())).willReturn(commentLike1);
 
-        CommentLikePlusOutput output = commentLikeService.like(new CommentLikePlusInput(user1.getId(), comment1.getId()));
+        CommentLikePlusOutput output = commentLikeService.like(user1.getId(), new CommentLikePlusInput(comment1.getId()));
 
         Assertions.assertThat(output.getCommentLikeId()).isEqualTo(commentLike1.getId());
     }

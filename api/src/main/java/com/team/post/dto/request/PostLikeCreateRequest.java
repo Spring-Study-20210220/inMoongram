@@ -14,7 +14,7 @@ public class PostLikeCreateRequest {
         this.userId = userId;
     }
 
-    public static PostLikeCreateInput toServiceDto(PostLikeCreateRequest request, Long postId){
-        return new PostLikeCreateInput(request.getUserId(), postId);
+    public static PostLikeCreateInput toServiceDto(Long userId, Long postId) {
+        return new PostLikeCreateInput(userId, postId);
     }
 }

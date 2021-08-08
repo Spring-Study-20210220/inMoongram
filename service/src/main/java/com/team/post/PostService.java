@@ -26,8 +26,8 @@ public class PostService {
     private final PostTaggedUserService taggedUserService;
     private final PostTaggedKeywordService postTaggedKeywordService;
 
-    public SavePostOutput save(SavePostInput input) {
-        User user = userService.findUserById(input.getUserId());
+    public SavePostOutput save(Long userId, SavePostInput input) {
+        User user = userService.findUserById(userId);
         Post post = new Post(input.getContent(), user);
         Post savePost = postRepository.save(post);
 
@@ -75,7 +75,7 @@ public class PostService {
     }
 
     private List<User> getTaggedUsers(List<Long> userIds) {
-        if(userIds == null) {
+        if (userIds == null) {
             return null;
         }
         return userIds.stream()

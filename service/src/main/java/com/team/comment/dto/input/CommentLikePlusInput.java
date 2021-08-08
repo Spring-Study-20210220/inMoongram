@@ -4,11 +4,9 @@ import lombok.Data;
 
 @Data
 public class CommentLikePlusInput {
-    private Long userId;
     private Long commentId;
 
-    public CommentLikePlusInput(Long userId, Long commentId) {
-        this.userId = userId;
+    public CommentLikePlusInput(Long commentId) {
         this.commentId = commentId;
     }
 }

@@ -1,5 +1,6 @@
 package com.team.post;
 
+import com.team.authUtil.TestAuthProvider;
 import com.team.dbutil.DatabaseCleanup;
 import com.team.dbutil.PostData;
 import com.team.dbutil.UserData;
@@ -7,6 +8,7 @@ import com.team.post.dto.request.SavePostRequest;
 import com.team.post.dto.response.SavePostResponse;
 import com.team.user.User;
 import io.restassured.http.ContentType;
+import io.restassured.http.Cookie;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,16 +16,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles(value = {"dev"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PostAcceptanceTest {
     @LocalServerPort
@@ -31,6 +36,9 @@ class PostAcceptanceTest {
 
     @Autowired
     private DatabaseCleanup dbCleanup;
+
+    @Autowired
+    private TestAuthProvider testAuthProvider;
 
     @Autowired
     private UserData userData;
@@ -43,9 +51,9 @@ class PostAcceptanceTest {
     private User user3;
 
     String absolutePath;
+
     @BeforeEach
     void setUp() {
-
         String path = "src/test/resources/images";
         absolutePath = new File(path).getAbsolutePath();
         user1 = userData.saveUser("testUser1", "testNickname1", "test1@test.com");
@@ -60,32 +68,32 @@ class PostAcceptanceTest {
 
     @Test
     void 게시글_저장() throws IOException {
-        MultipartFile postImage1 = new MockMultipartFile("apple.jpeg", new FileInputStream(absolutePath+"/apple.jpeg"));
-        MultipartFile postImage2 = new MockMultipartFile("grape.jpeg", new FileInputStream(absolutePath+"/grape.jpeg"));
+        MultipartFile postImage1 = new MockMultipartFile("apple.jpeg", new FileInputStream(absolutePath + "/apple.jpeg"));
+        MultipartFile postImage2 = new MockMultipartFile("grape.jpeg", new FileInputStream(absolutePath + "/grape.jpeg"));
+        Cookie cookie = testAuthProvider.getAccessTokenCookie(user1);
         String keyword = "inMoongram";
         SavePostRequest request = SavePostRequest.builder()
-                .userId(user1.getId())
                 .content("test-content")
                 .postImages(Arrays.asList(postImage1, postImage2))
                 .taggedUserIds(Arrays.asList(user2.getId(), user3.getId()))
-                .taggedKeywords(Arrays.asList(keyword))
+                .taggedKeywords(Collections.singletonList(keyword))
                 .build();
 
         SavePostResponse response =
                 given()
+                        .cookie(cookie)
                         .port(port)
                         .accept(ContentType.JSON)
-                        .multiPart("userId", request.getUserId())
                         .multiPart("content", request.getContent())
                         .multiPart("taggedUserIds", user2.getId())
                         .multiPart("taggedUserIds", user3.getId())
                         .multiPart("taggedKeywords", keyword)
-                        .multiPart("postImages", new File(absolutePath+"/apple.jpeg"))
-                        .multiPart("postImages", new File(absolutePath+"/grape.jpeg"))
+                        .multiPart("postImages", new File(absolutePath + "/apple.jpeg"))
+                        .multiPart("postImages", new File(absolutePath + "/grape.jpeg"))
                         .log().all()
-                .when()
+                        .when()
                         .post("/post")
-                .then()
+                        .then()
                         .statusCode(201)
                         .extract()
                         .as(SavePostResponse.class);
@@ -96,13 +104,15 @@ class PostAcceptanceTest {
     @Test
     void 게시글_삭제() {
         Post post = postData.savePost(user1);
+        Cookie cookie = testAuthProvider.getAccessTokenCookie();
 
         given()
+                .cookie(cookie)
                 .port(port)
                 .accept("application/json")
-        .when()
+                .when()
                 .delete("/post/{post-id}", post.getId())
-        .then()
+                .then()
                 .statusCode(204);
     }
 }

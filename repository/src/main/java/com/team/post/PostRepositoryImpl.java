@@ -31,7 +31,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     private BooleanExpression userIdEq(Long userId) {
-        if(userId == null || userId < 0) {
+        if (userId == null || userId < 0) {
             return null;
         }
         return user.id.eq(userId);

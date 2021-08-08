@@ -1,4 +1,4 @@
-package com.team.security.config;
+package com.team.config;
 
 import com.team.security.jwt.JwtFilter;
 import com.team.security.jwt.TokenProvider;

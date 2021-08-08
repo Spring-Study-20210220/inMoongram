@@ -1,5 +1,6 @@
 package com.team.comment;
 
+import com.team.authUtil.TestAuthProvider;
 import com.team.comment.dto.request.CommentSaveRequest;
 import com.team.comment.dto.response.CommentInfoResponse;
 import com.team.comment.dto.response.CommentSaveResponse;
@@ -8,8 +9,8 @@ import com.team.dbutil.PostData;
 import com.team.dbutil.UserData;
 import com.team.post.Post;
 import com.team.user.User;
+import io.restassured.http.Cookie;
 import io.restassured.response.Response;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,12 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles(value = {"dev"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CommentAcceptanceTest {
     @LocalServerPort
@@ -30,6 +33,9 @@ class CommentAcceptanceTest {
 
     @Autowired
     private DatabaseCleanup dbCleanup;
+
+    @Autowired
+    private TestAuthProvider testAuthProvider;
 
     @Autowired
     private UserData userData;
@@ -45,7 +51,7 @@ class CommentAcceptanceTest {
     private User taggedUser2;
 
     @BeforeEach
-    void setup(){
+    void setup() {
         commentWriter = userData.saveUser("승화", "a", "a@naver.com");
         postAuthor = userData.saveUser("준수", "b", "b@naver.com");
         taggedUser1 = userData.saveUser("용우", "c", "c@naver.com");
@@ -62,17 +68,18 @@ class CommentAcceptanceTest {
 
     @Test
     void 댓글생성() {
-        User author = userData.saveUser("승화", "a", "a@naver.com");
-        User commentWriter = userData.saveUser("준수", "b", "b@naver.com");
+        User author = userData.saveUser("아이언맨", "ironFist", "ironman@naver.com");
         Post post = postData.savePost(author);
 
+        Cookie cookie = testAuthProvider.getAccessTokenCookie(author);
+
         var request = CommentSaveRequest.builder()
-                .writerId(commentWriter.getId())
                 .postId(post.getId())
                 .content("댓글내용")
                 .build();
         given()
                 .port(port)
+                .cookie(cookie)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(request)
                 .when()
@@ -83,17 +90,17 @@ class CommentAcceptanceTest {
 
     @Test
     void 댓글조회() {
-        List<String> taggedKeywords = List.of("아이유", "카더가든","헤이즈");
-        List<Long> taggedUserIds = List.of(taggedUser1.getId(),taggedUser2.getId());
-        Long superCommentId = getCommentTestData(null,taggedKeywords,null);
-        Long subCommentId1 = getCommentTestData(superCommentId,null,taggedUserIds);
-        Long subCommentId2 = getCommentTestData(superCommentId,null,null);
+        List<String> taggedKeywords = List.of("아이유", "카더가든", "헤이즈");
+        List<Long> taggedUserIds = List.of(taggedUser1.getId(), taggedUser2.getId());
+        Long superCommentId = getCommentTestData(null, taggedKeywords, null);
+        Long subCommentId1 = getCommentTestData(superCommentId, null, taggedUserIds);
+        Long subCommentId2 = getCommentTestData(superCommentId, null, null);
         Response response = given()
                 .port(port)
                 .param("postId", testPostId)
-        .when()
+                .when()
                 .get("/comments")
-        .thenReturn();
+                .thenReturn();
 
         assertThat(response.getStatusCode()).isEqualTo(200);
         var responseList = response.as(CommentInfoResponse.class)
@@ -103,23 +110,25 @@ class CommentAcceptanceTest {
                 .containsAll(taggedKeywords);
         assertThat(responseList.get(0).getSubComments())
                 .extracting("id")
-                .contains(subCommentId1,subCommentId2);
+                .contains(subCommentId1, subCommentId2);
     }
 
     @Test
     void 댓글삭제() {
-        Long commentId = getCommentTestData(null,null,null);
+        Long commentId = getCommentTestData(null, null, null);
+        Cookie cookie = testAuthProvider.getAccessTokenCookie(commentWriter);
         given()
                 .port(port)
-        .when()
-                .delete("/comment/{commentId}",commentId)
-        .then()
+                .cookie(cookie)
+                .when()
+                .delete("/comment/{commentId}", commentId)
+                .then()
                 .statusCode(204);
     }
 
     public Long getCommentTestData(Long superCommentId, List<String> taggedKeywords, List<Long> userIds) {
+        Cookie cookie = testAuthProvider.getAccessTokenCookie(commentWriter);
         var request = CommentSaveRequest.builder()
-                .writerId(commentWriter.getId())
                 .postId(post.getId())
                 .content("댓글내용")
                 .superCommentId(superCommentId)
@@ -129,6 +138,7 @@ class CommentAcceptanceTest {
 
         Response response = given()
                 .port(port)
+                .cookie(cookie)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(request)
                 .when()
