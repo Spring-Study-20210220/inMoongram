@@ -3,6 +3,7 @@ package com.team.post;
 import com.team.post.dto.output.SavePostOutput;
 import com.team.post.dto.request.SavePostRequest;
 import com.team.post.dto.response.SavePostResponse;
+import com.team.security.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +22,11 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping(value = "")
-    public ResponseEntity<SavePostResponse> savePost(@Valid @ModelAttribute SavePostRequest request) {
-        SavePostOutput output = postService.save(request.toInput());
+    public ResponseEntity<SavePostResponse> savePost(@CurrentUser Long userId, @Valid @ModelAttribute SavePostRequest request) {
+        SavePostOutput output = postService.save(userId, request.toInput());
+
         UriComponents uriComponents = MvcUriComponentsBuilder
-                .fromMethodCall(on(PostController.class).savePost(request))
+                .fromMethodCall(on(PostController.class).savePost(userId, request))
                 .build();
 
         return ResponseEntity

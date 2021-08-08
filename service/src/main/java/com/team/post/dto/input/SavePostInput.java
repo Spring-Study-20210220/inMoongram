@@ -11,15 +11,13 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SavePostInput {
-    private Long userId;
     private String content;
     private List<MultipartFile> postImages;
     private List<Long> taggedUserIds;
     private List<String> taggedKeywords;
 
     @Builder
-    public SavePostInput(Long userId, String content, List<MultipartFile> postImages, List<Long> taggedUserIds, List<String> taggedKeywords) {
-        this.userId = userId;
+    public SavePostInput(String content, List<MultipartFile> postImages, List<Long> taggedUserIds, List<String> taggedKeywords) {
         this.content = content;
         this.postImages = postImages;
         this.taggedUserIds = taggedUserIds;
