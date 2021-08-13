@@ -1,9 +1,9 @@
 package com.team.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.team.security.HttpCookieOAuth2AuthorizationRequestRepository;
-import com.team.security.OAuth2AuthenticationFailureHandler;
-import com.team.security.OAuth2AuthenticationSuccessHandler;
+import com.team.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.team.security.oauth2.OAuth2AuthenticationFailureHandler;
+import com.team.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.team.security.jwt.JwtAccessDeniedHandler;
 import com.team.security.jwt.JwtAuthenticationEntryPoint;
 import com.team.security.jwt.TokenProvider;

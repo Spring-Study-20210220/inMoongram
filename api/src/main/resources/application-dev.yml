@@ -36,6 +36,10 @@ app:
     secret: WTB1X2M0bnRfTDBva190aDFzX3NlY3IzdF9LM3lfUjFnaHQ/MTIzMjEwMTAxMTAxMjEyMTIxMzEzMTMxMzEzMQ==
     expiretime: 864000000
 
+redirect:
+  success: http://localhost:3000/
+  fail: http://localhost:3000/fail
+
 #logging:
 #  level:
 #    root: debug

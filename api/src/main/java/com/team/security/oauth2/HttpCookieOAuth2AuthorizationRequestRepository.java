@@ -1,4 +1,4 @@
-package com.team.security;
+package com.team.security.oauth2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team.util.CookieUtil;
