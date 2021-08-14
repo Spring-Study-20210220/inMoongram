@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class OAuth2UserService {
+public class OAuthUserService {
 
     private final UserRepository userRepository;
 

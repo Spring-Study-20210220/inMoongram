@@ -7,6 +7,7 @@ import com.team.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.team.security.jwt.JwtAccessDeniedHandler;
 import com.team.security.jwt.JwtAuthenticationEntryPoint;
 import com.team.security.jwt.TokenProvider;
+import com.team.user.OAuthUserService;
 import com.team.util.CookieUtil;
 import com.team.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final ObjectMapper objectMapper;
-    private final com.team.user.OAuth2UserService userService;
+    private final OAuthUserService userService;
 
     private static final String[] permitAllUrls = new String[]{
             "/oauth2/login", "/login", "/signup", "/verify/**"

@@ -1,6 +1,7 @@
 package com.team.security.oauth2;
 
 import com.team.security.jwt.TokenProvider;
+import com.team.user.OAuthUserService;
 import com.team.user.dto.input.OAuth2SignupInput;
 import com.team.util.CookieUtil;
 import com.team.util.RedisUtil;
@@ -26,7 +27,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private final RedisUtil redisUtil;
 
-    private final com.team.user.OAuth2UserService userService;
+    private final OAuthUserService userService;
 
     @Value("${redirect.success}")
     private String SUCCESS_REDIRECT_URL;
@@ -35,7 +36,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     public OAuth2AuthenticationSuccessHandler(TokenProvider tokenProvider,
                                               CookieUtil cookieUtil,
                                               RedisUtil redisUtil,
-                                              com.team.user.OAuth2UserService userService) {
+                                              com.team.user.OAuthUserService userService) {
         this.tokenProvider = tokenProvider;
         this.cookieUtil = cookieUtil;
         this.redisUtil = redisUtil;
