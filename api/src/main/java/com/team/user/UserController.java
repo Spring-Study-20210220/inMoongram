@@ -5,9 +5,12 @@ import com.team.post.dto.input.FeedInput;
 import com.team.post.dto.output.FeedOutput;
 import com.team.post.dto.response.FeedResponse;
 import com.team.security.CurrentUser;
+import com.team.user.dto.input.UserInfoInput;
+import com.team.user.dto.output.UserInfoOutput;
 import com.team.user.dto.request.UserProfileModificationRequest;
 import com.team.user.dto.response.FollowListResponse;
 import com.team.user.dto.response.FollowerInfoListResponse;
+import com.team.user.dto.response.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,15 @@ import javax.validation.constraints.Positive;
 public class UserController {
     private final UserService userService;
     private final PostService postService;
+
+    @GetMapping("/info")
+    public ResponseEntity<UserInfoResponse> getInfo(@CurrentUser Long userId) {
+        UserInfoOutput userInfo = userService.getUserInfo(new UserInfoInput(userId));
+
+        return ResponseEntity.ok(
+                new UserInfoResponse(userInfo)
+        );
+    }
 
     @GetMapping("/followings")
     public ResponseEntity<FollowListResponse> getFollowList(@CurrentUser Long userId) {

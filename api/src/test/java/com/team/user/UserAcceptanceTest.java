@@ -30,6 +30,7 @@ import java.util.*;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.*;
 
 @ActiveProfiles(value = {"dev"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -53,6 +54,25 @@ class UserAcceptanceTest {
     @AfterEach
     void tearDown() {
         dbCleanup.execute();
+    }
+
+    @Test
+    void 유저_정보_가져오기() {
+        User user1 = userData.saveUser("승화", "a", "a@naver.com");
+
+        Cookie cookie = testAuthProvider.getAccessTokenCookie(user1);
+
+        given()
+                .port(port)
+                .cookie(cookie)
+                .accept("application/json")
+        .when()
+                .get("/user/info")
+        .then()
+                .statusCode(200)
+                .body("email", equalTo(user1.getEmail()))
+                .body("name", equalTo(user1.getName()))
+                .body("nickname", equalTo(user1.getNickname()));
     }
 
     @Test

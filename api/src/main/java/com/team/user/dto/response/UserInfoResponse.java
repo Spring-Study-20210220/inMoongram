@@ -1,6 +1,7 @@
 package com.team.user.dto.response;
 
 import com.team.user.Sex;
+import com.team.user.dto.output.UserInfoOutput;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,5 +35,16 @@ public class UserInfoResponse {
         this.introduction = introduction;
         this.sex = sex;
         this.website = website;
+    }
+
+    public UserInfoResponse(UserInfoOutput output) {
+        this.email = output.getEmail();
+        this.password = output.getPassword();
+        this.nickname = output.getNickname();
+        this.name = output.getName();
+        this.phoneNumber = output.getPhoneNumber();
+        this.introduction = output.getIntroduction();
+        this.sex = output.getSex();
+        this.website = output.getWebsite();
     }
 }
