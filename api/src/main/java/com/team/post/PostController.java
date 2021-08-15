@@ -1,7 +1,10 @@
 package com.team.post;
 
+import com.team.post.dto.input.PostGetInput;
+import com.team.post.dto.output.PostGetOutput;
 import com.team.post.dto.output.SavePostOutput;
 import com.team.post.dto.request.SavePostRequest;
+import com.team.post.dto.response.PostGetResponse;
 import com.team.post.dto.response.SavePostResponse;
 import com.team.security.CurrentUser;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +35,12 @@ public class PostController {
         return ResponseEntity
                 .created(uriComponents.toUri())
                 .body(new SavePostResponse(output));
+    }
+
+    @GetMapping("/{post-id}")
+    public ResponseEntity<PostGetResponse> getPost(@PathVariable(name = "post-id") Long postId) {
+        PostGetOutput postOutput = postService.getPost(new PostGetInput(postId));
+        return ResponseEntity.ok(new PostGetResponse(postOutput));
     }
 
     @DeleteMapping("/{post-id}")

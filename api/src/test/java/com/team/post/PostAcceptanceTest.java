@@ -27,6 +27,7 @@ import java.util.Collections;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.*;
 
 @ActiveProfiles(value = {"dev"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -99,6 +100,24 @@ class PostAcceptanceTest {
                         .as(SavePostResponse.class);
 
         assertThat(response.getPostId()).isEqualTo(1L);
+    }
+
+    @Test
+    void 게시글_가져오기() {
+        Post post = postData.savePost(user1);
+        Cookie cookie = testAuthProvider.getAccessTokenCookie();
+
+        given()
+                .port(port)
+                .accept("application/json")
+                .cookie(cookie)
+        .when()
+                .get("/post/{post-id}", post.getId())
+        .then()
+                .statusCode(200)
+                .body("postId", is(post.getId().intValue()))
+                .body("content", equalTo(post.getContent()));
+
     }
 
     @Test

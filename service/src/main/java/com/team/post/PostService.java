@@ -2,8 +2,10 @@ package com.team.post;
 
 import com.team.exception.IdNotFoundException;
 import com.team.post.dto.input.FeedInput;
+import com.team.post.dto.input.PostGetInput;
 import com.team.post.dto.input.SavePostInput;
 import com.team.post.dto.output.FeedOutput;
+import com.team.post.dto.output.PostGetOutput;
 import com.team.post.dto.output.SavePostOutput;
 import com.team.tag.PostTaggedKeyword;
 import com.team.tag.PostTaggedUser;
@@ -35,6 +37,13 @@ public class PostService {
         tagKeywords(input, savePost);
         uploadImages(input, savePost);
         return new SavePostOutput(savePost);
+    }
+
+    public PostGetOutput getPost(PostGetInput input) {
+        Post post = postRepository.getPostById(input.getPostId())
+                .orElseThrow(IdNotFoundException::new);
+
+        return new PostGetOutput(post);
     }
 
     public FeedOutput getFeed(FeedInput input) {
