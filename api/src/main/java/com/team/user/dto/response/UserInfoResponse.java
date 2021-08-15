@@ -12,8 +12,6 @@ import lombok.NoArgsConstructor;
 public class UserInfoResponse {
     private String email;
 
-    private String password;
-
     private String nickname;
 
     private String name;
@@ -26,9 +24,8 @@ public class UserInfoResponse {
 
     private String website;
 
-    public UserInfoResponse(String email, String password, String nickname, String name, String phoneNumber, String introduction, Sex sex, String website) {
+    public UserInfoResponse(String email, String nickname, String name, String phoneNumber, String introduction, Sex sex, String website) {
         this.email = email;
-        this.password = password;
         this.nickname = nickname;
         this.name = name;
         this.phoneNumber = phoneNumber;
@@ -39,7 +36,6 @@ public class UserInfoResponse {
 
     public UserInfoResponse(UserInfoOutput output) {
         this.email = output.getEmail();
-        this.password = output.getPassword();
         this.nickname = output.getNickname();
         this.name = output.getName();
         this.phoneNumber = output.getPhoneNumber();
